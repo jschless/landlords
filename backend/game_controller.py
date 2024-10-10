@@ -15,15 +15,10 @@ logger = logging.getLogger(__name__)
 
 fake = Faker()
 test_names = [
-    "a",
-    "x",
-    "c",
-    "d",
-    "g",
     "Harry_U",
     "Dick_U",
     "Tom_U",
-]
+] * 10
 
 
 class GameController:
@@ -152,9 +147,12 @@ class GameController:
                 # need to get the right thing from a player, so give them 3 chances then pass
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
+                    # break if this is valid
+                    break
                 except ValueError:
                     logger.info("Submission was malformed or something, try again")
 
+            logger.info(f"The following hand was submitted: {new_hand}")
             if new_hand is not None:
                 last_hand, last_player = new_hand, new_player
                 cur_round.append(last_hand)
@@ -231,6 +229,7 @@ class GameController:
         self.g.landlord = highest_bidder
 
     def parse_move(self, json_data):
+        logger.info(f"Trying to parse this JSON as a move: {json_data}")
         hand_cards, kicker_cards = [], []
         for c in json_data["cards"]:
             hand_cards.append(c["card"])
@@ -256,8 +255,11 @@ class GameController:
                 new_hand.hand_cards + new_hand.kicker_cards
             )
             await self.update_all()
-            g.next_player()
-            #
-            return hand
+            cur_player = self.g.current_player
+            self.g.next_player()
+            return new_hand, cur_player
         else:
+            logger.info(
+                f"{new_hand} from {new_hand_json} was not a valid move with existing hand {h}"
+            )
             raise ValueError("Not a valid move")
