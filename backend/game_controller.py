@@ -258,16 +258,15 @@ class GameController:
             f"Setting landlord as highest_bidder: {highest_bidder}. Bid for round is {self.g.bid}"
         )
 
+    def get_cards_from_json(self, cards_json: List[Dict]) -> List[int]:
+        return [c["card"] for c in cards_json]
+
     def parse_move(self, json_data):
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
-        hand_cards, kicker_cards = [], []
-        for c in json_data["cards"]:
-            hand_cards.append(c["card"])
-
-        for c in json_data["kickers"]:
-            kicker_cards.append(c["card"])
-
-        return Hand.parse_hand(hand_cards, kicker_cards)
+        return Hand.parse_hand(
+            self.get_cards_from_json(json_data["cards"]),
+            self.get_cards_from_json(json_data["kickers"]),
+        )
 
     async def get_turn(self, h: Hand | None):
         # get turn from current_player
