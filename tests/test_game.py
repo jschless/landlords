@@ -8,6 +8,8 @@ class TestGame:
         assert midprocess_game.game_data("Harry") == {
             "game_id": "569IR",
             "username": "Harry_U",
+            "current_player": 0,
+            "scoreboard": {},
             "my_cards": [
                 3,
                 4,
