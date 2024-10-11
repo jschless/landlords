@@ -187,8 +187,8 @@ class GameController:
                 return
 
             if new_hand is not None:
-                last_hand, last_player = new_hand, new_player
-                cur_round.append(last_hand)
+                cur_hand, last_player = new_hand, new_player
+                cur_round.append(cur_hand)
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
@@ -249,8 +249,12 @@ class GameController:
 
     async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
         # get turn from current_player
+
+        serializable_hand = None if h is None else h.model_dump(mode="json")
+
         await self.send_personal_message(
-            self.g.current_player, {"action": "make_a_move", "last_hand": h}
+            self.g.current_player,
+            {"action": "make_a_move", "last_hand": serializable_hand},
         )
         new_hand_json = await self.wait_for_message(self.g.current_player, "move")
         new_hand = self.parse_move(new_hand_json)
@@ -263,6 +267,7 @@ class GameController:
             self.g.next_player()
             return None, cur_player
         elif h is None or h.is_valid_successor(new_hand):
+            logger.info(f"New hand is {new_hand}, old hand was {h}")
             # remove cards
             if new_hand.is_bomb():
                 self.g.bid *= 2
