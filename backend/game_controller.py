@@ -80,11 +80,6 @@ class GameController:
             if p_id == player_id and message_action == action:
                 return message
 
-    async def try_to_start(self):
-        if len(self.active_connections) == 3 and not self.g.started:
-            logger.info("Starting game now!")
-            await self.start_game()
-
     async def listen_for_messages(self, websocket, uid):
         player_id = self.uid_to_player[uid]
         try:
@@ -117,6 +112,11 @@ class GameController:
             except WebSocketDisconnect:
                 self.disconnect(connection)
                 logger.info(f"WebSocketDisconnect error in broadcast")
+
+    async def try_to_start(self):
+        if len(self.active_connections) == 3 and not self.g.started:
+            logger.info("Starting game now!")
+            await self.start_game()
 
     async def game_loop(self):
         while not self.g.is_over():
@@ -158,6 +158,33 @@ class GameController:
         except WebSocketDisconnect:
             self.disconnect(conn)
 
+    def initialize_game(self, players: List[Player], game_id: str):
+        self.g = Game(game_id=game_id, players=players)
+
+    async def start_game(self):
+        if not self.g.can_start():
+            raise ValueError("Need 3 players to start game")
+        if os.getenv("TEST") == "True":
+            logger.info("Not shuffling... this is the test environment.")
+        else:
+            self.g.shuffle_deck()
+
+        self.deal_cards()
+        self.g.get_blind()
+        self.flip_one_card()
+        self.g.started = True
+        self.g.initialize_scoreboard()
+
+        await self.update_all()
+        await self.determine_landlord()
+
+        if self.g.landlord is None:
+            raise NotImplementedError("No one became landlord")
+        else:
+            self.g.players[self.g.landlord].make_landlord(self.g.blind)
+            await self.update_all()
+            await self.game_loop()
+
     async def run_round(self):
         # first turn establishes hand type
         cur_round = []
@@ -166,9 +193,10 @@ class GameController:
         while True:
             for _ in range(3):
                 # need to get the right thing from a player, so give them 3 chances then pass
+                # TODO: frontend validation and timeout
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
-                    # break if this is valid
+                    # break for loop if this is valid
                     break
                 except ValueError:
                     logger.info("Submission was malformed or something, try again")
@@ -184,42 +212,11 @@ class GameController:
                 cur_round.append(last_hand)
 
             if self.g.current_player == last_player:
-                # everyone passed and its back to the starter
+                # The round is over because the last two people passed
+                # TODO: frontend auto pass if they can't go
                 logger.info(f"{self.g.players[self.g.current_player]} wins the round")
                 self.g.register_round(cur_round)
                 break
-
-    def initialize_game(self, players: List[Player], game_id: str):
-        self.g = Game(game_id=game_id, players=players)
-
-    async def start_game(self):
-        if not self.g.can_start():
-            raise ValueError("Need 3 players to start game")
-        if os.getenv("TEST") == "True":
-            logger.info("Not shuffling... this is the test environment.")
-        else:
-            self.g.shuffle_deck()
-
-        self.deal_cards()
-
-        self.g.get_blind()
-
-        self.flip_one_card()
-
-        self.g.started = True
-
-        self.g.initialize_scoreboard()
-
-        await self.update_all()
-
-        await self.determine_landlord()
-
-        if self.g.landlord is None:
-            raise NotImplementedError("No one became landlord")
-        else:
-            self.g.players[self.g.landlord].make_landlord(self.g.blind)
-            await self.update_all()
-            await self.game_loop()
 
     def deal_cards(self):
         for i in range(3):
@@ -252,6 +249,7 @@ class GameController:
                 highest_bidder = player_id
                 logger.info(f"New highest bidder is {player_id}")
             if highest_bid == 3:
+                # no one else needs to bid anymore
                 break
         self.g.landlord = highest_bidder
         self.g.current_player = highest_bidder
