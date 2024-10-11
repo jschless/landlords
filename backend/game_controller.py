@@ -101,27 +101,22 @@ class GameController:
             logger.info(f"Disconnect while listening for messages for {player_id}")
             self.disconnect(websocket)
 
-    def disconnect(self, websocket: WebSocket):
-        logger.info(f"Disconnecting websocket")
-        self.active_connections.remove(websocket)
+    async def send_personal_message(self, player_id: int, message: Dict) -> None:
+        await self.player_to_connection[player_id].send_text(json.dumps(message))
 
-    async def send_personal_message(self, player: int, message: Dict):
-        await self.player_to_connection[player].send_text(json.dumps(message))
+    async def update_all(self) -> None:
+        for player_id, connection in self.player_to_connection.items():
+            uid = self.player_to_uid(player_id)
+            await self.send_personal_message(player_id, self.g.game_data(uid))
 
-    async def broadcast(self, message):
-        for connection in self.active_connections:
-            try:
-                await connection.send_text(message)
-            except WebSocketDisconnect:
-                self.disconnect(connection)
-                logger.info(f"WebSocketDisconnect error in broadcast")
+    ### GAME LOGIC CONTROL
 
-    async def try_to_start(self):
+    async def try_to_start(self) -> None:
         if len(self.active_connections) == 3 and not self.g.started:
             logger.info("Starting game now!")
             await self.start_game()
 
-    async def game_loop(self):
+    async def game_loop(self) -> None:
         while not self.g.is_over():
             await self.run_round()
 
