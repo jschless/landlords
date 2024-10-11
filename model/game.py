@@ -81,6 +81,7 @@ class Game(BaseModel):
             "landlord": self.landlord,
             "started": self.started,
             "action": "update",
+            "current_player": self.current_player,
         }
 
         return new_dict

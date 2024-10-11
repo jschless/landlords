@@ -227,6 +227,7 @@ class GameController:
                 break
         logger.info(f"Setting landlord as highest_bidder: {highest_bidder}")
         self.g.landlord = highest_bidder
+        self.g.current_player = highest_bidder
 
     def parse_move(self, json_data):
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
@@ -247,15 +248,18 @@ class GameController:
         new_hand_json = await self.wait_for_message(self.g.current_player, "move")
         new_hand = self.parse_move(new_hand_json)
         logger.info(f"Parsed move of {new_hand}")
-        # Move has been validated, check if it works.
 
-        if h is None or h.is_valid_successor(new_hand):
+        # Move has been validated, check if it works.
+        cur_player = self.g.current_player
+        if new_hand is None:
+            self.g.next_player()
+            return None, cur_player
+        elif h is None or h.is_valid_successor(new_hand):
             # remove cards
             self.g.players[self.g.current_player].remove_cards(
                 new_hand.hand_cards + new_hand.kicker_cards
             )
             await self.update_all()
-            cur_player = self.g.current_player
             self.g.next_player()
             return new_hand, cur_player
         else:

@@ -80,24 +80,73 @@ async def test_through_bet(fastapi_server):
 @pytest.mark.asyncio
 async def test_through_first_move(fastapi_server):
     p1_moves = [
-        {"action": "bet", "bet": "1"},
+        {"action": "bet", "bet": "3"},
         {"action": "move", "cards": [{"card": 3}, {"card": 3}], "kickers": []},
     ]
     p2_moves = [
-        {"action": "bet", "bet": "2"},
         {"action": "move", "cards": [{"card": 7}, {"card": 7}], "kickers": []},
     ]
     p3_moves = [
-        {"action": "bet", "bet": "3"},
         {"action": "move", "cards": [{"card": 11}, {"card": 11}], "kickers": []},
     ]
 
     results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
     tom = next((x for x in results if x["username"] == "Tom_U"), None)
     assert tom["my_cards"].count(3) == 0
+    assert len(tom["my_cards"]) == 18
     for p in tom["players"]:
         if p["username"] == "Harry_U":
             # Landlord has played two cards (20 - 18)
-            assert p["n_cards"] == 18
+            assert p["n_cards"] == 15
         else:
             assert p["n_cards"] == 15
+
+
+@pytest.mark.asyncio
+async def test_complete_round(fastapi_server):
+    """
+    P3 wins the round of betting.
+    P3 opens with a 6 card straight.
+    P1 wins with a better round.
+    Everyone passes
+    """
+    p1_moves = [
+        {"action": "bet", "bet": "1"},
+        {
+            "action": "move",
+            "cards": [
+                {"card": 6},
+                {"card": 7},
+                {"card": 8},
+                {"card": 9},
+                {"card": 10},
+                {"card": 11},
+            ],
+            "kickers": [],
+        },
+    ]
+    p2_moves = [
+        {"action": "bet", "bet": "2"},
+        {"action": "move", "cards": [], "kickers": []},
+    ]
+    p3_moves = [
+        {"action": "bet", "bet": "3"},
+        {
+            "action": "move",
+            "cards": [
+                {"card": 3},
+                {"card": 4},
+                {"card": 5},
+                {"card": 6},
+                {"card": 7},
+                {"card": 8},
+            ],
+            "kickers": [],
+        },
+        {"action": "move", "cards": [], "kickers": []},
+    ]
+
+    results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
+    tom = next((x for x in results if x["username"] == "Tom_U"), None)
+    assert len(tom["my_cards"]) == 11
+    assert tom["current_player"] == 0
