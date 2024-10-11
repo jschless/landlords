@@ -121,6 +121,7 @@ class GameController:
     async def game_loop(self):
         while not self.g.is_over():
             await self.run_round()
+        logger.info(f"Game is over")
 
     async def update_all(self):
         for player_id, connection in self.player_to_connection.items():
@@ -153,6 +154,11 @@ class GameController:
                     logger.info("Submission was malformed or something, try again")
 
             logger.info(f"The following hand was submitted: {new_hand}")
+
+            if self.g.is_over():
+                logger.info("Exiting run_round loop, game is over")
+                return
+
             if new_hand is not None:
                 last_hand, last_player = new_hand, new_player
                 cur_round.append(last_hand)

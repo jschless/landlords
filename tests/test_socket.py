@@ -9,6 +9,19 @@ import uvicorn
 import multiprocessing
 
 
+def format_move(cards, kickers):
+    ans = {"action": "move"}
+    card_list = []
+    for c in cards:
+        card_list.append({"card": c})
+    kicker_list = []
+    for c in kickers:
+        kicker_list.append({"card": c})
+    ans["cards"] = card_list
+    ans["kickers"] = kicker_list
+    return ans
+
+
 def run_server():
     os.environ["TEST"] = "True"
     uvicorn.run(app, host="127.0.0.1", port=8000)
@@ -103,50 +116,51 @@ async def test_through_first_move(fastapi_server):
 
 
 @pytest.mark.asyncio
-async def test_complete_round(fastapi_server):
+async def test_complete_hand(fastapi_server):
     """
     P3 wins the round of betting.
     P3 opens with a 6 card straight.
-    P1 wins with a better round.
-    Everyone passes
+    P1 wins with a better hand.
+    Everyone passes until P1 wins
     """
     p1_moves = [
         {"action": "bet", "bet": "1"},
-        {
-            "action": "move",
-            "cards": [
-                {"card": 6},
-                {"card": 7},
-                {"card": 8},
-                {"card": 9},
-                {"card": 10},
-                {"card": 11},
-            ],
-            "kickers": [],
-        },
+        format_move([6, 7, 8, 9, 10, 11], []),
     ]
-    p2_moves = [
-        {"action": "bet", "bet": "2"},
-        {"action": "move", "cards": [], "kickers": []},
-    ]
+    p2_moves = [{"action": "bet", "bet": "2"}, format_move([], [])]
     p3_moves = [
         {"action": "bet", "bet": "3"},
-        {
-            "action": "move",
-            "cards": [
-                {"card": 3},
-                {"card": 4},
-                {"card": 5},
-                {"card": 6},
-                {"card": 7},
-                {"card": 8},
-            ],
-            "kickers": [],
-        },
-        {"action": "move", "cards": [], "kickers": []},
+        format_move([3, 4, 5, 6, 7, 8], []),
+        format_move([], []),
     ]
 
     results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
     tom = next((x for x in results if x["username"] == "Tom_U"), None)
     assert len(tom["my_cards"]) == 11
     assert tom["current_player"] == 0
+
+
+@pytest.mark.asyncio
+async def test_complete_round(fastapi_server):
+    p1_moves = [
+        {"action": "bet", "bet": "1"},
+        format_move([], []),
+        format_move([], []),
+    ]
+    p2_moves = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+        format_move([], []),
+    ]
+    p3_moves = [
+        {"action": "bet", "bet": "3"},
+        format_move([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], []),
+        format_move([11, 12, 13, 14, 15], []),
+        format_move([16, 17], []),
+    ]
+
+    results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
+    harry = next((x for x in results if x["username"] == "Harry_U"), None)
+    assert len(harry["my_cards"]) == 0
+    tom = next((x for x in results if x["username"] == "Tom_U"), None)
+    assert len(tom["my_cards"]) == 17
