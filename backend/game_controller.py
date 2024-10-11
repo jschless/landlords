@@ -121,7 +121,13 @@ class GameController:
     async def game_loop(self):
         while not self.g.is_over():
             await self.run_round()
-        logger.info(f"Game is over")
+
+        winner = self.g.get_winner()
+        self.g.update_scoreboard()
+        await self.update_all()
+        logger.info(
+            f"Game is over. Winner is {winner}.\nUpdated scoreboard is {self.g.scoreboard}"
+        )
 
     async def update_all(self):
         for player_id, connection in self.player_to_connection.items():
@@ -156,7 +162,7 @@ class GameController:
             logger.info(f"The following hand was submitted: {new_hand}")
 
             if self.g.is_over():
-                logger.info("Exiting run_round loop, game is over")
+                logger.info("Exiting run_round loop, round is over")
                 return
 
             if new_hand is not None:
@@ -187,6 +193,8 @@ class GameController:
         self.flip_one_card()
 
         self.g.started = True
+
+        self.g.initialize_scoreboard()
 
         await self.update_all()
 
@@ -231,9 +239,12 @@ class GameController:
                 logger.info(f"New highest bidder is {player_id}")
             if highest_bid == 3:
                 break
-        logger.info(f"Setting landlord as highest_bidder: {highest_bidder}")
         self.g.landlord = highest_bidder
         self.g.current_player = highest_bidder
+        self.g.bid = highest_bid
+        logger.info(
+            f"Setting landlord as highest_bidder: {highest_bidder}. Bid for round is {self.g.bid}"
+        )
 
     def parse_move(self, json_data):
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
@@ -257,11 +268,15 @@ class GameController:
 
         # Move has been validated, check if it works.
         cur_player = self.g.current_player
+
         if new_hand is None:
             self.g.next_player()
             return None, cur_player
         elif h is None or h.is_valid_successor(new_hand):
             # remove cards
+            if new_hand.is_bomb():
+                self.g.bid *= 2
+                logger.info(f"Bomb was dropped, bid is now {self.g.bid}")
             self.g.players[self.g.current_player].remove_cards(
                 new_hand.hand_cards + new_hand.kicker_cards
             )

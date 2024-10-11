@@ -1,7 +1,7 @@
 from .player import Player
 from .hand import Hand
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 from pydantic import BaseModel, Field, root_validator
 import random
 import json
@@ -16,10 +16,12 @@ class Game(BaseModel):
     current_player: int = 0
     rand_seed: Optional[int] = None
     landlord: Optional[int] = None
+    bid: int = 0
     blind: Optional[List[int]] = None
     deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
     rounds: List[List[int]] = []
     started: bool = False
+    scoreboard: Dict = {}
 
     def random_gen(self):
         if self.rand_seed:
@@ -44,6 +46,12 @@ class Game(BaseModel):
     def get_blind(self):
         self.blind = sorted(self.deck[51:])
 
+    def get_winner(self):
+        for p in self.players:
+            if len(p.cards) == 0:
+                return p
+        return None
+
     def is_over(self):
         return any(len(self.players[i].cards) == 0 for i in range(3))
 
@@ -55,6 +63,19 @@ class Game(BaseModel):
 
     def register_round(self, r: List[Hand]):
         self.rounds.append(r)
+
+    def initialize_scoreboard(self):
+        if len(self.scoreboard) == 0:
+            for p in self.players:
+                self.scoreboard[p.username] = 0
+
+    def update_scoreboard(self):
+        winner = self.get_winner()
+        for p in self.players:
+            if p.username == winner.username:
+                self.scoreboard[p.username] += 2 * self.bid
+            else:
+                self.scoreboard[p.username] -= self.bid
 
     def game_data(self, uid: int):
         new_players = []
@@ -82,6 +103,7 @@ class Game(BaseModel):
             "started": self.started,
             "action": "update",
             "current_player": self.current_player,
+            "scoreboard": self.scoreboard,
         }
 
         return new_dict

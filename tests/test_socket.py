@@ -164,3 +164,5 @@ async def test_complete_round(fastapi_server):
     assert len(harry["my_cards"]) == 0
     tom = next((x for x in results if x["username"] == "Tom_U"), None)
     assert len(tom["my_cards"]) == 17
+
+    assert harry["scoreboard"]["Harry_U"] == 12
