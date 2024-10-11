@@ -64,6 +64,17 @@ class Game(BaseModel):
     def register_round(self, r: List[Hand]):
         self.rounds.append(r)
 
+    def reset_game(self):
+        # Runs after a game is over
+        for p in self.players:
+            p.reset()
+        self.current_player = 0
+        self.landlord = None
+        self.bid = 0
+        self.blind = None
+        self.deck = list(range(3, 16)) * 4 + [16, 17]
+        self.started = False
+
     def initialize_scoreboard(self):
         if len(self.scoreboard) == 0:
             for p in self.players:

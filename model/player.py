@@ -36,10 +36,7 @@ class Player(BaseModel):
                 self.exposed_cards.remove(c)
             self.spent_cards.append(c)
 
-    def get_bid(self, current_bid: int) -> int:
-        # TODO: implement user input
-        return current_bid + 1
-
-    def play(self, current_hand: Hand) -> Hand:
-        # TODO: implement user input for hand
-        return current_bid
+    def reset(self) -> None:
+        self.cards = []
+        self.exposed_cards = []
+        self.spent_cards = []

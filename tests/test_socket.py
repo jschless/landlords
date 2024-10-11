@@ -55,14 +55,16 @@ async def execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves):
                     try:
                         message = await asyncio.wait_for(websocket.recv(), timeout=5)
                         data = json.loads(message)
-                        if (
-                            data["action"] == "make_a_bid"
-                            or data["action"] == "make_a_move"
-                        ):
+                        if data["action"] in {
+                            "make_a_bid",
+                            "make_a_move",
+                            "game_over",
+                        }:
                             response = messages_to_send.pop()
                             await websocket.send(json.dumps(response))
                         elif data["action"] == "update":
                             update = data
+
                     except asyncio.TimeoutError:
                         return update
                     except Exception as e:
@@ -166,3 +168,31 @@ async def test_complete_round(fastapi_server):
     assert len(tom["my_cards"]) == 17
 
     assert harry["scoreboard"]["Harry_U"] == 12
+
+
+@pytest.mark.asyncio
+async def test_two_rounds(fastapi_server):
+    p1_moves = [
+        {"action": "bet", "bet": "1"},
+        format_move([], []),
+        format_move([], []),
+    ] * 2
+    p2_moves = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+        format_move([], []),
+    ] * 2
+    p3_moves = [
+        {"action": "bet", "bet": "3"},
+        format_move([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], []),
+        format_move([11, 12, 13, 14, 15], []),
+        format_move([16, 17], []),
+        {"action": "play_again", "decision": True},
+    ] * 2
+
+    results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
+    harry = next((x for x in results if x["username"] == "Harry_U"), None)
+    assert harry["scoreboard"]["Harry_U"] == 24
+    # assert len(harry["my_cards"]) == 0
+    # tom = next((x for x in results if x["username"] == "Tom_U"), None)
+    # assert len(tom["my_cards"]) == 17

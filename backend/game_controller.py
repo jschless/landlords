@@ -125,9 +125,23 @@ class GameController:
         winner = self.g.get_winner()
         self.g.update_scoreboard()
         await self.update_all()
+
         logger.info(
             f"Game is over. Winner is {winner}.\nUpdated scoreboard is {self.g.scoreboard}"
         )
+
+        # send landlord renew request
+        await self.send_personal_message(self.g.landlord, {"action": "game_over"})
+        response = await self.wait_for_message(self.g.landlord, "play_again")
+
+        logger.info(f"Renew game response was {response}")
+        if response["decision"] == True:
+            await self.play_again()
+
+    async def play_again(self):
+        logger.info(f"Resetting game and starting over.")
+        self.g.reset_game()
+        await self.start_game()
 
     async def update_all(self):
         for player_id, connection in self.player_to_connection.items():
