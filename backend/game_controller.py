@@ -5,7 +5,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from model.game import Game
 from model.player import Player
 from model.hand import Hand
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 import random
 from faker import Faker
 
@@ -29,17 +29,16 @@ class GameController:
     """
 
     def __init__(self, game_id: str):
-        self.game_id = game_id
+        self.game_id: str = game_id
         self.uid_to_player: Dict[str, int] = {}
         self.active_connections: List[WebSocket] = []
         self.player_to_connection: Dict[int, WebSocket] = {}
-        self.message_queue = asyncio.Queue()
+        self.message_queue: asyncio.Queue = asyncio.Queue()
 
-    async def connect(self, websocket: WebSocket, uid: str):
+    async def connect(self, websocket: WebSocket, uid: str) -> None:
         logger.info(f"Current connections: {self.active_connections}")
         if len(self.active_connections) > 3:
             logger.info(f"No more people can join")
-            return
         elif uid in self.uid_to_player:
             # don't add a new user, this is a reconnect
             self.player_to_connection[self.uid_to_player[uid]] = websocket
@@ -52,7 +51,11 @@ class GameController:
             self.add_player(websocket, None, uid)
             await websocket.accept()
 
-    def add_player(self, websocket: WebSocket, username: str | None, uid: str):
+    def disconnect(self, websocket: WebSocket) -> None:
+        logger.info(f"Disconnecting websocket")
+        self.active_connections.remove(websocket)
+
+    def add_player(self, websocket: WebSocket, username: str | None, uid: str) -> None:
         self.player_to_connection[len(self.active_connections)] = websocket
         self.uid_to_player[uid] = len(self.active_connections)
         self.active_connections.append(websocket)
@@ -63,13 +66,14 @@ class GameController:
                 username = fake.name()
         self.g.players.append(Player(username=username, uid=uid))
 
-    def player_to_uid(self, player_id: int):
-        logger.info(f"uid_to_player: {self.uid_to_player}")
+    def player_to_uid(self, player_id: int) -> str:
         for uid, pid in self.uid_to_player.items():
             if pid == player_id:
                 return uid
 
-    async def wait_for_message(self, player_id: int, action: str):
+    ### COMMUNICATION FUNCTIONS
+
+    async def wait_for_message(self, player_id: int, action: str) -> Dict:
         """Retrieve a message from the queue for the given player_id."""
         logger.info(f"Call to wait_for_message from {player_id} with action {action}")
         while True:
@@ -80,10 +84,9 @@ class GameController:
             if p_id == player_id and message_action == action:
                 return message
 
-    async def listen_for_messages(self, websocket, uid):
+    async def listen_for_messages(self, websocket: WebSocket, uid: str) -> None:
         player_id = self.uid_to_player[uid]
         try:
-            await self.update(player_id)
             logger.info(f"Persistent listener initiated for {player_id}")
             while True:
                 message = await websocket.receive_text()
@@ -126,9 +129,7 @@ class GameController:
         self.g.update_scoreboard()
         await self.update_all()
 
-        logger.info(
-            f"Game is over. Winner is {winner}.\nUpdated scoreboard is {self.g.scoreboard}"
-        )
+        logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
         # send landlord renew request
         await self.send_personal_message(self.g.landlord, {"action": "game_over"})
@@ -138,32 +139,15 @@ class GameController:
         if response["decision"] == True:
             await self.play_again()
 
-    async def play_again(self):
+    async def play_again(self) -> None:
         logger.info(f"Resetting game and starting over.")
         self.g.reset_game()
         await self.start_game()
 
-    async def update_all(self):
-        for player_id, connection in self.player_to_connection.items():
-            await self.update(player_id)
-
-    async def update(self, player_id: int):
-        # refresh the game state for a certain player
-        conn = self.player_to_connection[player_id]
-        uid = self.player_to_uid(player_id)
-        data = json.dumps(self.g.game_data(uid))
-        try:
-            logger.info(f"Sending {data} to {uid}/{player_id}")
-            await conn.send_text(data)
-        except WebSocketDisconnect:
-            self.disconnect(conn)
-
-    def initialize_game(self, players: List[Player], game_id: str):
+    def initialize_game(self, players: List[Player], game_id: str) -> None:
         self.g = Game(game_id=game_id, players=players)
 
-    async def start_game(self):
-        if not self.g.can_start():
-            raise ValueError("Need 3 players to start game")
+    async def start_game(self) -> None:
         if os.getenv("TEST") == "True":
             logger.info("Not shuffling... this is the test environment.")
         else:
@@ -185,7 +169,7 @@ class GameController:
             await self.update_all()
             await self.game_loop()
 
-    async def run_round(self):
+    async def run_round(self) -> None:
         # first turn establishes hand type
         cur_round = []
         cur_hand, last_player = None, None
@@ -218,11 +202,11 @@ class GameController:
                 self.g.register_round(cur_round)
                 break
 
-    def deal_cards(self):
+    def deal_cards(self) -> None:
         for i in range(3):
             self.g.players[i].deal_cards(sorted(self.g.deck[17 * i : 17 * (i + 1)]))
 
-    def flip_one_card(self):
+    def flip_one_card(self) -> None:
         # randomly chose someone to flip a card. they will bid first
         if os.getenv("TEST") == "True":
             self.g.current_player = 0
@@ -231,7 +215,7 @@ class GameController:
             self.g.current_player = random.choice([0, 1, 2])
             self.g.players[self.g.current_player].flip_card()
 
-    async def determine_landlord(self):
+    async def determine_landlord(self) -> None:
         # solicit bids one after the other, needs to be in websocket
         highest_bid, highest_bidder = 0, None
         for i in range(3):
@@ -261,14 +245,14 @@ class GameController:
     def get_cards_from_json(self, cards_json: List[Dict]) -> List[int]:
         return [c["card"] for c in cards_json]
 
-    def parse_move(self, json_data):
+    def parse_move(self, json_data: Dict) -> Hand:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
         return Hand.parse_hand(
             self.get_cards_from_json(json_data["cards"]),
             self.get_cards_from_json(json_data["kickers"]),
         )
 
-    async def get_turn(self, h: Hand | None):
+    async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
         # get turn from current_player
         await self.send_personal_message(
             self.g.current_player, {"action": "make_a_move", "last_hand": h}
