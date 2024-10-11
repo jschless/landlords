@@ -259,3 +259,13 @@ async def test_invalid_following_move(fastapi_server):
     assert len(harry["my_cards"]) == 15
     assert len(tom["my_cards"]) == 17
     assert len(dick["my_cards"]) == 17
+
+
+@pytest.mark.asyncio
+async def test_beginning_disconnect():
+    pass
+
+
+@pytest.mark.asyncio
+async def test_midround_disconnect():
+    pass
