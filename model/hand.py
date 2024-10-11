@@ -31,6 +31,9 @@ class Hand(BaseModel):
     @classmethod
     def parse_hand(cls, hand_cards: List[int], kicker_cards: List[int]) -> "Hand":
         # takes a list of cards and kicker cards and pdocues a hand
+        if len(hand_cards) == 0 and len(kicker_cards) == 0:
+            return None  # represents a pass
+
         base, chain_length, low = cls.analyze_cards(hand_cards)
         kicker_base, kicker_len = cls.analyze_kicker(kicker_cards)
 
