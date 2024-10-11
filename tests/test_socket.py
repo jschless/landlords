@@ -196,3 +196,66 @@ async def test_two_rounds(fastapi_server):
     # assert len(harry["my_cards"]) == 0
     # tom = next((x for x in results if x["username"] == "Tom_U"), None)
     # assert len(tom["my_cards"]) == 17
+
+
+@pytest.mark.asyncio
+async def test_invalid_start_move(fastapi_server):
+    p1_moves = [
+        {"action": "bet", "bet": "1"},
+        format_move([6, 7, 8, 9, 10], []),
+        format_move([], []),
+    ]
+    p2_moves = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+        format_move([], []),
+    ]
+    p3_moves = [
+        {"action": "bet", "bet": "3"},
+        format_move([3, 5, 6, 7, 8], []),  # bad move
+        format_move([3, 4, 5, 6, 7], []),  # correct move
+        format_move([], []),
+    ]
+
+    results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
+
+    # So Tom should be current_play
+    assert results[0]["current_player"] == 0
+
+    harry = next((x for x in results if x["username"] == "Harry_U"), None)
+    tom = next((x for x in results if x["username"] == "Tom_U"), None)
+    dick = next((x for x in results if x["username"] == "Dick_U"), None)
+    assert len(harry["my_cards"]) == 15
+    assert len(tom["my_cards"]) == 12
+    assert len(dick["my_cards"]) == 17
+
+
+@pytest.mark.asyncio
+async def test_invalid_following_move(fastapi_server):
+    p1_moves = [
+        {"action": "bet", "bet": "1"},
+        format_move([6, 7, 8, 9, 10, 11], []),
+        format_move([], []),
+    ]
+    p2_moves = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+        format_move([], []),
+    ]
+    p3_moves = [
+        {"action": "bet", "bet": "3"},
+        format_move([3, 5, 6, 7, 8], []),  # bad move
+        format_move([3, 4, 5, 6, 7], []),  # correct move
+        format_move([], []),
+    ]
+
+    results = await execute_moves(fastapi_server, p1_moves, p2_moves, p3_moves)
+
+    assert results[0]["current_player"] == 2
+
+    harry = next((x for x in results if x["username"] == "Harry_U"), None)
+    tom = next((x for x in results if x["username"] == "Tom_U"), None)
+    dick = next((x for x in results if x["username"] == "Dick_U"), None)
+    assert len(harry["my_cards"]) == 15
+    assert len(tom["my_cards"]) == 17
+    assert len(dick["my_cards"]) == 17
