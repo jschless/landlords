@@ -190,9 +190,17 @@ class GameController:
                     # break for loop if this is valid
                     break
                 except ValueError:
+                    serializable_hand = (
+                        None if cur_hand is None else cur_hand.model_dump(mode="json")
+                    )
+                    await self.send_personal_message(
+                        self.g.current_player,
+                        {"action": "bad_turn", "last_hand": serializable_hand},
+                    )
                     logger.info("Submission was malformed or something, try again")
 
-            logger.info(f"The following hand was submitted: {new_hand}")
+            logger.info(f"The following hand was submitted: {new_hand}, updating")
+            self.update_all()
 
             if self.g.is_over():
                 logger.info("Exiting run_round loop, round is over")
@@ -271,6 +279,11 @@ class GameController:
         new_hand_json = await self.wait_for_message(self.g.current_player, "move")
         new_hand = self.parse_move(new_hand_json)
         logger.info(f"Parsed move of {new_hand}")
+
+        # Check if cards are in hand
+        if not self.g.players[self.g.current_player].has_cards(new_hand):
+            logger.info(f"{self.g.current_player} tried to play cards they didn't have")
+            raise ValueError("Player doesn't have the cards")
 
         # Move has been validated, check if it works.
         cur_player = self.g.current_player

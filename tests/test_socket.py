@@ -178,15 +178,87 @@ async def test_invalid_following_move(fastapi_server):
 
 
 @pytest.mark.asyncio
-async def test_simultaneous_connections():
-    pass
+async def test_invalid_following_move_2(fastapi_server):
+    p1 = [
+        {"action": "bet", "bet": "3"},
+        format_move([6, 7, 8, 9, 10, 11], []),
+        format_move([], []),
+    ]
+    p2 = [
+        format_move([], []),
+        format_move([], []),
+    ]
+    p3 = [
+        format_move([3, 4, 5, 6, 7, 8], []),  # bad move because its smaller
+        format_move([], []),
+    ]
+
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
+
+    tom, dick, harry = tuple(results)
+    assert tom["current_player"] == 0
+
+    assert len(harry["my_cards"]) == 17
+    assert len(tom["my_cards"]) == 14
+    assert len(dick["my_cards"]) == 17
 
 
 @pytest.mark.asyncio
-async def test_beginning_disconnect():
-    pass
+async def test_skip_on_three_bad_submissions(fastapi_server):
+    p1 = [
+        {"action": "bet", "bet": "3"},
+        format_move([6, 7, 8, 9, 10], []),
+    ]
+    p2 = [
+        format_move([], []),
+    ]
+    p3 = [
+        format_move([3, 5, 6, 7, 8], []),  # bad move
+        format_move([3, 5, 6, 7, 8], []),  # bad move
+        format_move([3, 5, 6, 7, 8], []),  # bad move
+        format_move([3, 4, 5, 6, 7], []),  # correct move, but shoudln't happen
+        format_move([], []),
+    ]
+
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
+
+    tom, dick, harry = tuple(results)
+    assert tom["current_player"] == 0
+
+    assert len(harry["my_cards"]) == 17
+    assert len(tom["my_cards"]) == 15
+    assert len(dick["my_cards"]) == 17
 
 
 @pytest.mark.asyncio
-async def test_midround_disconnect():
+async def test_submitting_fake_cards(fastapi_server):
+    p1 = [
+        {"action": "bet", "bet": "1"},
+        format_move([], []),
+        format_move([10], []),
+    ]
+    p2 = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+        format_move([], []),
+    ]
+    p3 = [
+        {"action": "bet", "bet": "3"},
+        format_move([3, 4, 5, 6, 7, 8], []),
+        format_move([3, 4, 5, 6, 7, 8], []),  # Doesn't have these cards anymore
+        format_move([9], []),
+    ]
+
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
+
+    tom, dick, harry = tuple(results)
+
+    assert len(harry["my_cards"]) == 13
+    assert len(tom["my_cards"]) == 16
+    assert len(dick["my_cards"]) == 17
+
+
+@pytest.mark.asyncio
+async def test_submitting_bad_kicker():
+    # TODO: add a new test deal that has more exciting card combos
     pass

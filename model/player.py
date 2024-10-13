@@ -1,6 +1,7 @@
 from model.hand import Hand
 from pydantic import BaseModel, Field
 from typing import List
+from collections import Counter
 import random
 
 
@@ -40,3 +41,14 @@ class Player(BaseModel):
         self.cards = []
         self.exposed_cards = []
         self.spent_cards = []
+
+    def has_cards(self, h: None | Hand) -> bool:
+        if h is None:
+            return True
+        hand_count = Counter(h.kicker_cards + h.hand_cards)
+        card_count = Counter(self.cards)
+
+        for item, count in hand_count.items():
+            if card_count[item] < count:
+                return False
+        return True
