@@ -1,77 +1,5 @@
-import websockets
-import os
-from backend.server import app
 import pytest
-import json
-import asyncio
-import httpx
-import uvicorn
-import multiprocessing
-from typing import List, Tuple
-
-
-def format_move(cards, kickers):
-    return {
-        "action": "move",
-        "cards": [{"card": c} for c in cards],
-        "kickers": [{"card": c} for c in kickers],
-    }
-
-
-def run_server():
-    os.environ["TEST"] = "True"
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
-@pytest.fixture(scope="module")
-def fastapi_server():
-    server_process = multiprocessing.Process(target=run_server)
-    server_process.start()
-    asyncio.run(asyncio.sleep(1))
-    # This is where the tests will run
-    yield
-    server_process.terminate()
-    server_process.join()
-
-
-async def execute_moves(fastapi_server, p1_moves, p2, p3):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(f"http://localhost:8000/create_game")
-        assert response.status_code == 200
-        game_id = response.json()["game_id"]
-
-    async def connect_websocket(user_id, messages_to_send, delay):
-        await asyncio.sleep(delay)
-        update = None
-        async with websockets.connect(
-            f"ws://localhost:8000/ws/game/{game_id}?id={user_id}"
-        ) as websocket:
-            while True:  # len(messages_to_send) > 0:
-                try:
-                    message = await asyncio.wait_for(websocket.recv(), timeout=5)
-                    data = json.loads(message)
-                    if data["action"] in {
-                        "make_a_bid",
-                        "make_a_move",
-                        "game_over",
-                    }:
-                        if len(messages_to_send) > 0:
-                            response = messages_to_send.pop()
-                            await websocket.send(json.dumps(response))
-                    elif data["action"] == "update":
-                        update = data
-
-                except asyncio.TimeoutError:
-                    return update
-            return update
-
-    tasks = [
-        connect_websocket("Tom", p1_moves[::-1], 0),
-        connect_websocket("Dick", p2[::-1], 1),
-        connect_websocket("Harry", p3[::-1], 2),
-    ]
-    results = await asyncio.gather(*tasks)
-    return results
+from .utils import format_move, execute_moves_multiple
 
 
 @pytest.mark.asyncio
@@ -80,7 +8,7 @@ async def test_through_bet(fastapi_server):
     p2 = [{"action": "bet", "bet": "2"}]
     p3 = [{"action": "bet", "bet": "3"}]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
     tom, dick, harry = tuple(results)
 
     assert harry["landlord"] == 2
@@ -93,7 +21,7 @@ async def test_through_first_move(fastapi_server):
     p2 = [format_move([7, 7], [])]
     p3 = [format_move([11, 11], [])]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     tom, dick, harry = tuple(results)
 
@@ -126,7 +54,7 @@ async def test_complete_hand(fastapi_server):
         format_move([], []),
     ]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     tom, dick, harry = tuple(results)
     assert len(tom["my_cards"]) == 11
@@ -152,7 +80,7 @@ async def test_complete_round(fastapi_server):
         format_move([16, 17], []),
     ]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     tom, dick, harry = tuple(results)
 
@@ -182,7 +110,7 @@ async def test_two_rounds(fastapi_server):
         {"action": "play_again", "decision": True},
     ] * 2
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
     tom, dick, harry = tuple(results)
     assert harry["scoreboard"][harry["username"]] == 24
     # assert len(harry["my_cards"]) == 0
@@ -209,7 +137,7 @@ async def test_invalid_start_move(fastapi_server):
         format_move([], []),
     ]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     # So Tom should be current_play
 
@@ -239,7 +167,7 @@ async def test_invalid_following_move(fastapi_server):
         format_move([], []),
     ]
 
-    results = await execute_moves(fastapi_server, p1, p2, p3)
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     tom, dick, harry = tuple(results)
     assert tom["current_player"] == 2
