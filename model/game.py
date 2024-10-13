@@ -22,6 +22,7 @@ class Game(BaseModel):
     rounds: List[List[int]] = []
     started: bool = False
     scoreboard: Dict = {}
+    game_count: int = 0
 
     def random_gen(self):
         if self.rand_seed:

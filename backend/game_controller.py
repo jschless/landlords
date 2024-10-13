@@ -5,7 +5,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from model.game import Game
 from model.player import Player
 from model.hand import Hand
-from typing import List, Dict, Set, Tuple
+from typing import List, Dict, Tuple
 import random
 from faker import Faker
 
@@ -14,11 +14,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 fake = Faker()
-test_names = [
-    "Harry_U",
-    "Dick_U",
-    "Tom_U",
-] * 10
+
+test_names = ["Tom_U", "Dick_U", "Harry_U"]
 
 
 class GameController:
@@ -50,10 +47,12 @@ class GameController:
         else:
             self.add_player(websocket, None, uid)
             await websocket.accept()
+            await self.update_all()
 
     def disconnect(self, websocket: WebSocket) -> None:
-        logger.info(f"Disconnecting websocket")
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            logger.info(f"Disconnecting websocket")
+            self.active_connections.remove(websocket)
 
     def add_player(self, websocket: WebSocket, username: str | None, uid: str) -> None:
         self.player_to_connection[len(self.active_connections)] = websocket
@@ -61,7 +60,7 @@ class GameController:
         self.active_connections.append(websocket)
         if username is None:
             if os.getenv("TEST") == "True":
-                username = test_names.pop()
+                username = test_names[len(self.g.players)] + f"{self.g.game_count}"
             else:
                 username = fake.name()
         self.g.players.append(Player(username=username, uid=uid))
@@ -102,7 +101,17 @@ class GameController:
             self.disconnect(websocket)
 
     async def send_personal_message(self, player_id: int, message: Dict) -> None:
-        await self.player_to_connection[player_id].send_text(json.dumps(message))
+        try:
+            await self.player_to_connection[player_id].send_text(json.dumps(message))
+        except WebSocketDisconnect:
+            logger.info(
+                f"Disconnect while trying to send a personal message to {player_id} with {message}"
+            )
+            self.disconnect(self.player_to_connection[player_id])
+        except RuntimeError as e:
+            logger.info(
+                f"EXCEPTION {e}  while trying to send a personal message to {player_id} with {message}"
+            )
 
     async def update_all(self) -> None:
         for player_id, connection in self.player_to_connection.items():
@@ -139,8 +148,11 @@ class GameController:
         self.g.reset_game()
         await self.start_game()
 
-    def initialize_game(self, players: List[Player], game_id: str) -> None:
+    def initialize_game(
+        self, players: List[Player], game_id: str, game_count: int
+    ) -> None:
         self.g = Game(game_id=game_id, players=players)
+        self.g.game_count = game_count
 
     async def start_game(self) -> None:
         if os.getenv("TEST") == "True":

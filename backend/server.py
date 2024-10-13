@@ -54,7 +54,7 @@ async def get_home():
 async def create_game():
     game_id = gen_game_id()
     game_manager = GameController(game_id)
-    game_manager.initialize_game(players=[], game_id=game_id)
+    game_manager.initialize_game(players=[], game_id=game_id, game_count=len(games))
     games[game_id] = game_manager
     return {"game_id": game_id}
 
