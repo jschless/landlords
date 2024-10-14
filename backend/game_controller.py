@@ -141,14 +141,18 @@ class GameController:
             )
 
     async def update_all(self) -> None:
-        for player_id, connection in self.player_to_connection.items():
+        for player_id, _ in self.player_to_connection.items():
             uid = self.player_to_uid(player_id)
             await self.send_personal_message(player_id, self.g.game_data(uid))
 
     ### GAME LOGIC CONTROL
 
     async def try_to_start(self) -> None:
-        if len(self.active_connections) == 3 and not self.g.started:
+        if (
+            len(self.active_connections) == 3
+            and self.g.can_start()
+            and not self.g.started
+        ):
             logger.info("Starting game now!")
             await self.start_game()
 
