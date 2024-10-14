@@ -8,7 +8,7 @@ function BetComponent({ lastBid, submitBet }) {
       <h2>Make Your Bet:</h2>
       <div onChange={(e) => setBet(e.target.value)}>
         <label>
-          <input type="radio" value="0" name="bet" checked={bet === "pass"} />
+          <input type="radio" value="0" name="bet" checked={bet === "0"} />
           Pass
         </label>
 
