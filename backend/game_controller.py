@@ -170,6 +170,10 @@ class GameController:
         self.g.update_scoreboard()
         await self.update_all()
 
+        await self.alert_all(
+            f"{winner.username} wins this game! And {self.g.bid*2} points!"
+        )
+
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
         # send landlord renew request
