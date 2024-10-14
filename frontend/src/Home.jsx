@@ -1,5 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Text,
+  Stack,
+  useColorModeValue,
+} from "@chakra-ui/react";
 
 function Home() {
   const navigate = useNavigate();
@@ -26,10 +35,35 @@ function Home() {
   };
 
   return (
-    <div>
-      <h1>Welcome to the Game!</h1>
-      <button onClick={createGame}>Create Game</button>
-    </div>
+    <Container maxW="container.lg" p={4} centerContent>
+      <Stack spacing={6} align="center" textAlign="center">
+        <Heading as="h1" size="2xl" mb={4}>
+          Welcome to the Game!
+        </Heading>
+        <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
+          This is an interactive card game platform where you can create and join games with friends or other players. Test your skills, enjoy the competition, and have fun!
+        </Text>
+        <Button
+          onClick={createGame}
+          colorScheme="teal"
+          size="lg"
+          px={8}
+          variant="solid"
+        >
+          Create Game
+        </Button>
+      </Stack>
+      {/* Optional styling for better aesthetics */}
+      <Box
+        position="absolute"
+        bottom="20px"
+        left="50%"
+        transform="translateX(-50%)"
+        color={useColorModeValue("gray.500", "gray.400")}
+        fontSize="sm"
+      >
+      </Box>
+    </Container>
   );
 }
 

@@ -27,6 +27,7 @@ class Hand(BaseModel):
     kicker_len: conint(ge=0, le=5)
     hand_cards: List[conint(ge=3, le=17)]
     kicker_cards: List[conint(ge=3, le=17)]
+    string_repr: str = None
 
     @classmethod
     def parse_hand(cls, hand_cards: List[int], kicker_cards: List[int]) -> "Hand":
@@ -53,6 +54,7 @@ class Hand(BaseModel):
         )
 
     def serialize(self):
+        self.string_repr = self.__str__()
         return self.model_dump(mode="json")
 
     @staticmethod
