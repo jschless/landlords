@@ -7,9 +7,9 @@ from .conftest import complete_game_p1_blowout, complete_game_p3_blowout
 
 
 @pytest.mark.parametrize("player_to_test", [0, 1, 2])
-@pytest.mark.parametrize("disconnect_round", [1, 2, 3])
+@pytest.mark.parametrize("disconnect_round", [0, 1, 2, 3])
 @pytest.mark.asyncio
-async def test_midround_disconnect(fastapi_server, player_to_test, disconnect_round):
+async def test_disconnect(fastapi_server, player_to_test, disconnect_round):
     # open as many games as necessary
     async def connect_websocket(
         game_id, user_id, messages_to_send, delay, reconnect_at_message: int
@@ -25,8 +25,6 @@ async def test_midround_disconnect(fastapi_server, player_to_test, disconnect_ro
                         break
                     message = await asyncio.wait_for(websocket.recv(), timeout=2)
                     data = json.loads(message)
-                    if data["action"] != "update":
-                        print(f"{user_id} received {data}")
                     if data["action"] in {
                         "make_a_bid",
                         "make_a_move",
@@ -42,10 +40,8 @@ async def test_midround_disconnect(fastapi_server, player_to_test, disconnect_ro
                 except Exception as e:
                     return update
 
-            if reconnect_at_message == len(messages_to_send):
-                return await connect_websocket(
-                    game_id, user_id, messages_to_send, 0, -1
-                )
+        if reconnect_at_message == len(messages_to_send):
+            return await connect_websocket(game_id, user_id, messages_to_send, 0, -1)
 
     game_id = None
     async with httpx.AsyncClient() as client:
@@ -74,8 +70,3 @@ async def test_midround_disconnect(fastapi_server, player_to_test, disconnect_ro
     assert len(harry["my_cards"]) == 0
     assert dick["scoreboard"][harry["username"]] == 12
     assert tom["scoreboard"][dick["username"]] == -6
-
-
-@pytest.mark.asyncio
-async def test_beginning_disconnect():
-    pass
