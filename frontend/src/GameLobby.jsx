@@ -201,8 +201,9 @@ function GameLobby() {
         // Updates screen with new data
         setGameData(message);
       } else if (message.action === "alert") {
-          console.log(message.text);
-          setAlertMessage(message.text);
+          console.log("RECEIVED ALERT", message);
+          setAlertMessage(message.message);
+          setShowAlert(true);
           setTimeout(() => {
               setShowAlert(false);
           }, 3000);
