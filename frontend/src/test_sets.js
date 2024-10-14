@@ -123,7 +123,40 @@ export const completeGameTestData = {
         "Carla Munoz": -3,
         "Jordan Bishop": -3
     },
-    "cur_round": [],
+    "cur_round": [ 
+        [
+            "Dominic Miller",
+            {
+                "base": 2,
+                "chain_length": 1,
+                "low": 6,
+                "kicker_base": 0,
+                "kicker_len": 0,
+                "hand_cards": [
+                    6,
+                    6
+                ],
+                "kicker_cards": [],
+                "string_repr": "pair-1-chain with no discard"
+            }
+        ],
+        [
+            "Carla Munoz",
+            {
+                "base": 2,
+                "chain_length": 1,
+                "low": 7,
+                "kicker_base": 0,
+                "kicker_len": 0,
+                "hand_cards": [
+                    7,
+                    7
+                ],
+                "kicker_cards": [],
+                "string_repr": "pair-1-chain with no discard"
+            }
+        ]
+    ],
     "round_history": [
         [
             [
@@ -351,5 +384,4 @@ export const ogTestData =  {
     ],
     "bid": 3
 };
-
 

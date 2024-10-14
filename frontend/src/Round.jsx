@@ -4,12 +4,15 @@ import { Box, Flex, Image, Text, Heading } from "@chakra-ui/react";
 const Round = ({ hands, bidValue, currentPlayer }) => {
   return (
       <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md" flex="3">
+        <Heading>
+          Playing Area
+        </Heading>
 
       <Flex direction="column" alignItems="center" >
       {hands.map(([player, hand], index) => (
           <Flex key={index} alignItems="center" mb={4}>
             <Text p={0} m={2}>
-              {player}
+              ({index+1}) {player}
             </Text>
             <Flex
               direction="column"

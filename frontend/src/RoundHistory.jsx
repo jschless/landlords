@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Heading, Text, VStack, Image, Divider, HStack, Button } from "@chakra-ui/react";
 
 function RoundHistory({ roundHistory }) {
-  const [showHistory, setShowHistory] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Helper function to calculate total cards used in a round
   const getTotalCards = (hand) => {
