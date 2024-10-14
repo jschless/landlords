@@ -1,33 +1,35 @@
 import React, { useState } from "react";
+import { Box, Image, Button, Flex } from "@chakra-ui/react";
 
 function Hand({ myCards, onSubmit, promptMove }) {
   const [selectedCards, setSelectedCards] = useState([]);
-  const [selectedKickers, setSelectedKickers] = useState([]);
+    const [selectedKickers, setSelectedKickers] = useState([]);
+
+    console.log("Happening", myCards);
 
   const handleCardClick = (e, card, index) => {
     if (e.button === 0) {
       // Left-click
       if (e.shiftKey) {
-        // If shift key is pressed
-        // Add or remove from selectedKickers list
+        // If shift key is pressed, add/remove from selectedKickers list
         if (selectedKickers.some((c) => c.index === index)) {
-          setSelectedKickers(selectedKickers.filter((c) => c.index !== index)); // Remove if already selected
+          setSelectedKickers(selectedKickers.filter((c) => c.index !== index));
         } else {
-          setSelectedKickers([...selectedKickers, { card, index }]); // Add new kicker
+          setSelectedKickers([...selectedKickers, { card, index }]);
         }
       } else {
-        // Add or remove from selectedCards list
+        // Add/remove from selectedCards list
         if (selectedCards.some((c) => c.index === index)) {
-          setSelectedCards(selectedCards.filter((c) => c.index !== index)); // Remove if already selected
+          setSelectedCards(selectedCards.filter((c) => c.index !== index));
         } else {
-          setSelectedCards([...selectedCards, { card, index }]); // Add new card
+          setSelectedCards([...selectedCards, { card, index }]);
         }
       }
     }
   };
 
   const handleSubmit = () => {
-    if (selectedCards.length > 0) {
+    if (selectedCards.length >= 0) {
       console.log("submit happened", selectedCards, selectedKickers);
       onSubmit(selectedCards, selectedKickers);
       setSelectedCards([]);
@@ -36,46 +38,51 @@ function Hand({ myCards, onSubmit, promptMove }) {
   };
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "20px",
-          position: "absolute",
-          bottom: 0,
-          width: "100%",
-        }}
+    <Box position="relative">
+      {/* Card display */}
+      <Flex
+        justifyContent="center"
+        p={20}
+        mb={20} // Add margin bottom for spacing
+        width="100%"
+        wrap="wrap"
       >
+      
         {myCards.map((card, index) => (
-          <img
-            key={index}
+          <Image
             src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
             alt={`Card ${card}`}
-            style={{
-              width: "50px",
-              height: "75px",
-              margin: "5px",
-              border: selectedCards.some((c) => c.index === index)
+            boxSize="80px"
+            m={1}
+            border={
+              selectedCards.some((c) => c.index === index)
                 ? "3px solid blue"
                 : selectedKickers.some((c) => c.index === index)
-                  ? "3px solid orange"
-                  : "none",
-              cursor: "pointer",
-            }}
+                ? "3px solid orange"
+                : "none"
+            }
+            cursor="pointer"
             onClick={(e) => handleCardClick(e, card, index)}
           />
         ))}
-      </div>
+      </Flex>
+
+      {/* Submit button */}
       {promptMove && (
-        <button
+        <Button
           onClick={handleSubmit}
-          style={{ margin: "10px", padding: "10px" }}
+          mt={4}
+          p={4}
+          colorScheme="teal"
+          position="absolute"
+          bottom={-10}
+          left="50%"
+          transform="translateX(-50%)"
         >
           Submit Selected Cards
-        </button>
+        </Button>
       )}
-    </div>
+    </Box>
   );
 }
 
