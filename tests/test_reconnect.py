@@ -8,7 +8,7 @@ from .utils import execute_moves_multiple
 async def test_disconnect(
     fastapi_server, complete_game_p3_blowout, player_to_test, disconnect_round
 ):
-    p1, p2, p3 = complete_game_p3_blowout]
+    p1, p2, p3 = complete_game_p3_blowout
 
     results = await execute_moves_multiple(
         fastapi_server, [(p1, p2, p3)], player_to_test, disconnect_round

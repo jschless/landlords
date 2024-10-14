@@ -145,6 +145,12 @@ class GameController:
             uid = self.player_to_uid(player_id)
             await self.send_personal_message(player_id, self.g.game_data(uid))
 
+    async def alert_all(self, message) -> None:
+        for player_id, _ in self.player_to_connection.items():
+            uid = self.player_to_uid(player_id)
+            msg = {"action": "alert", "message": message}
+            await self.send_personal_message(player_id, msg)
+
     ### GAME LOGIC CONTROL
 
     async def try_to_start(self) -> None:
@@ -240,13 +246,20 @@ class GameController:
 
             if new_hand is not None:
                 cur_hand, last_player = new_hand, new_player
-                self.g.register_hand(cur_hand.serialize())
+                self.g.register_hand(
+                    self.g.players[last_player].username, cur_hand.serialize()
+                )
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
                 # TODO: frontend auto pass if they can't go
                 logger.info(f"{self.g.players[self.g.current_player]} wins the round")
+                self.alert_all(
+                    f"{self.g.players[self.g.current_player].username} wins the round"
+                )
                 self.g.register_round()
+                self.g.initialize_round()
+                await self.update_all()
                 break
 
             await self.update_all()

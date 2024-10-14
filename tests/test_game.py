@@ -39,6 +39,11 @@ class TestGame:
             "landlord": 2,
             "started": True,
             "action": "update",
+            "bid": 0,
+            "cur_round": [],
+            "landlord_username": "Harry_U",
+            "current_player_username": "Tom_U",
+            "round_history": [],
         }
 
 

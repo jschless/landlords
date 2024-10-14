@@ -19,7 +19,7 @@ class Game(BaseModel):
     bid: int = 0
     blind: Optional[List[int]] = None
     deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
-    rounds: List[List[int]] = []
+    rounds: List[List[Hand]] = []
     cur_round: List[Hand] = []
     started: bool = False
     scoreboard: Dict = {}
@@ -66,11 +66,11 @@ class Game(BaseModel):
     def initialize_round(self):
         self.cur_round = []
 
-    def register_hand(self, h: Hand):
-        self.cur_round.append(h)
+    def register_hand(self, p: Player, h: Hand):
+        self.cur_round.append((p, h))
 
-    def register_round(self, r: List[Hand]):
-        self.rounds.append(r)
+    def register_round(self):
+        self.rounds.append(self.cur_round)
 
     def reset_game(self):
         # Runs after a game is over
@@ -119,11 +119,18 @@ class Game(BaseModel):
             "my_cards": cards,
             "players": new_players,
             "landlord": self.landlord,
+            "landlord_username": None
+            if self.landlord is None
+            else self.players[self.landlord].username,
             "started": self.started,
             "action": "update",
             "current_player": self.current_player,
+            "current_player_username": None
+            if len(self.players) < 3
+            else self.players[self.current_player].username,
             "scoreboard": self.scoreboard,
             "cur_round": self.cur_round,
+            "round_history": self.rounds,
             "bid": self.bid,
         }
 
