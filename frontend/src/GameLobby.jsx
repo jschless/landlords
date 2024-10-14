@@ -6,6 +6,7 @@ import OpponentHand from "./OpponentHand";
 import Round from "./Round";
 import Scoreboard from "./Scoreboard";
 import AlertMessage from "./AlertMessage";
+import WaitingPage from "./WaitingPage";
 import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react'
 
 const testMode = true;
@@ -250,22 +251,8 @@ function GameLobby() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
     if (!gameData.started){
-        console.log("trying to do this");
-        return (
-            <div>
-            <Heading>Game Lobby: {gameData.game_id}</Heading>
-            <Text>
-              Waiting for  2 players to join currently here:
-            </Text>
-            <List>
-              <li key="0">You: {gameData.username}</li>
-              {gameData.players.map((player, index) => (
-                <li key={index+1}>{player.username}</li>
-              ))}          
-            </List>
-          </div>
+        return <WaitingPage gameData={gameData}/>
 
-        )
     }
 
           return (
@@ -295,7 +282,7 @@ function GameLobby() {
         )}
 
         {/* Display of Going Hand */}
-                  {gameData.started && <Round hands={gameData.cur_round} bidValue={gameData.bid} handType={"Test"} />}
+                  {gameData.started && <Round hands={gameData.cur_round} bidValue={gameData.bid} />}
 
         {/* Right Opponent */}
         {gameData.started && gameData.players && gameData.players.length > 1 && (

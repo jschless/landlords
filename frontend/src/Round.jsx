@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Flex, Image, Text, Heading } from "@chakra-ui/react";
 
-const Round = ({ hands, bidValue, handType, currentPlayer }) => {
+const Round = ({ hands, bidValue, currentPlayer }) => {
   return (
     <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md">
       {/* Header displaying bid value, hand type, and current player's turn */}
@@ -10,7 +10,7 @@ const Round = ({ hands, bidValue, handType, currentPlayer }) => {
           Bid Value: {bidValue}
         </Heading>
         <Text fontSize="lg" fontWeight="bold">
-          Hand Type: {handType}
+          Hand Type: {hands.length > 0 ? hands[0].string_repr : "None"}
         </Text>
         <Text fontSize="lg" fontWeight="bold" color="blue.500">
           It's {currentPlayer}'s turn!
