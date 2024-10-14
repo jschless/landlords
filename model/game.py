@@ -128,6 +128,9 @@ class Game(BaseModel):
             "current_player_username": None
             if len(self.players) < 3
             else self.players[self.current_player].username,
+            "current_player_uid": None
+            if len(self.players) < 3
+            else self.players[self.current_player].uid,
             "scoreboard": self.scoreboard,
             "cur_round": self.cur_round,
             "round_history": self.rounds,

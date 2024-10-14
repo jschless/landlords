@@ -7,11 +7,12 @@ import Round from "./Round";
 import Scoreboard from "./Scoreboard";
 import AlertMessage from "./AlertMessage";
 import WaitingPage from "./WaitingPage";
-import  RoundInfo from "./RoundInfo";
+import RoundInfo from "./RoundInfo";
 import RoundHistory from "./RoundHistory";
+import TurnBanner from "./TurnBanner";
 import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react';
 import { completeGameTestData } from "./test_sets.js";
-const testMode = true;
+const testMode = false;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -34,7 +35,8 @@ function GameLobby() {
   const [promptMove, setPromptMove] = useState(false);
   const [promptBet, setPromptBet] = useState(false);
     const [alertMessage, setAlertMessage] = useState(null);
-    const [showAlert, setShowAlert] = useState(false); 
+    const [showAlert, setShowAlert] = useState(false);
+    const [uniqueId, setUniqueId] = useState(""); // Add uniqueId to the state
 
 
   
@@ -80,14 +82,15 @@ function GameLobby() {
           fetchGameData();          
       }
 
-    let uniqueId = getCookie("uniqueId");
-    if (!uniqueId) {
-      uniqueId = "user_" + Math.random().toString(36).substr(2, 9);
-      setCookie("uniqueId", uniqueId, 7); // Set cookie for 7 days
+    let uniqueIdCook = getCookie("uniqueId");
+    if (!uniqueIdCook) {
+      uniqueIdCook = "user_" + Math.random().toString(36).substr(2, 9);
+      setCookie("uniqueId", uniqueIdCook, 7); // Set cookie for 7 days
     }
-
+    setUniqueId(uniqueIdCook); // Save the uniqueId in the state
+    
     const ws = new WebSocket(
-      `ws://localhost:8000/ws/game/${id}?id=${uniqueId}`,
+      `ws://localhost:8000/ws/game/${id}?id=${uniqueIdCook}`,
     );
 
     ws.onopen = () => {
@@ -172,6 +175,7 @@ function GameLobby() {
 
                 {showAlert && <AlertMessage message={alertMessage} />}
 
+                <TurnBanner gameDataUid={gameData.current_player_uid} uid={uniqueId}/>
                 <RoundInfo gameData={gameData}/>
 
       {/* Opponent Hands and Round Display */}
