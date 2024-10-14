@@ -127,7 +127,7 @@ class GameController:
                 f"Player {player_id} is not currently connected... trying again in 1 second"
             )
             await asyncio.sleep(1)
-            self.send_personal_message(self, player_id, message)
+            self.send_personal_message(player_id, message)
         try:
             await self.player_to_connection[player_id].send_text(json.dumps(message))
         except WebSocketDisconnect:
