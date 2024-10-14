@@ -12,9 +12,13 @@ def format_move(cards, kickers):
     }
 
 
-async def execute_moves_multiple(fastapi_server, moves):
+async def execute_moves_multiple(
+    fastapi_server, moves, player_to_test=-1, disconnect_round=-1
+):
     # open as many games as necessary
-    async def connect_websocket(game_id, user_id, messages_to_send, delay):
+    async def connect_websocket(
+        game_id, user_id, messages_to_send, delay, reconnect_at_message=-1
+    ):
         await asyncio.sleep(delay)
         async with websockets.connect(
             f"ws://localhost:8000/ws/game/{game_id}?id={user_id}"
@@ -22,6 +26,8 @@ async def execute_moves_multiple(fastapi_server, moves):
             update = None
             while True:
                 try:
+                    if reconnect_at_message == len(messages_to_send):
+                        break
                     message = await asyncio.wait_for(websocket.recv(), timeout=2)
                     data = json.loads(message)
                     if data["action"] in {
@@ -38,6 +44,8 @@ async def execute_moves_multiple(fastapi_server, moves):
                     return update
                 except Exception as e:
                     return update
+        if reconnect_at_message == len(messages_to_send):
+            return await connect_websocket(game_id, user_id, messages_to_send, 0, -1)
 
     game_ids = []
     for i, _ in enumerate(moves):
@@ -48,10 +56,14 @@ async def execute_moves_multiple(fastapi_server, moves):
 
     tasks = []
     for (i, game_id), (p1, p2, p3) in zip(game_ids, moves):
+        tom_var = len(p1) - disconnect_round if 0 == player_to_test else -1
+        dick_var = len(p2) - disconnect_round if 1 == player_to_test else -1
+        harry_var = len(p3) - disconnect_round if 2 == player_to_test else -1
+
         tasks += [
-            connect_websocket(game_id, f"Tom_{i}", p1[::-1], 0),
-            connect_websocket(game_id, f"Dick_{i}", p2[::-1], 1),
-            connect_websocket(game_id, f"Harry_{i}", p3[::-1], 2),
+            connect_websocket(game_id, f"Tom_{i}", p1[::-1], 0, tom_var),
+            connect_websocket(game_id, f"Dick_{i}", p2[::-1], 1, dick_var),
+            connect_websocket(game_id, f"Harry_{i}", p3[::-1], 2, harry_var),
         ]
     results = await asyncio.gather(*tasks)
     return results
