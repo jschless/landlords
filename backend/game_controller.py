@@ -210,9 +210,8 @@ class GameController:
 
     async def run_round(self) -> None:
         # first turn establishes hand type
-        cur_round = []
+        self.g.initialize_round()
         cur_hand, last_player = None, None
-        cur_round.append(cur_hand)
         while True:
             for _ in range(3):
                 # need to get the right thing from a player, so give them 3 chances then pass
@@ -227,12 +226,13 @@ class GameController:
                     )
                     await self.send_personal_message(
                         self.g.current_player,
-                        {"action": "bad_turn", "last_hand": serializable_hand},
+                        {
+                            "action": "alert",
+                            "message": f"That was an improper hand. You need to submit something of type {cur_hand}",
+                        },
                     )
-                    logger.info("Submission was malformed or something, try again")
 
             logger.info(f"The following hand was submitted: {new_hand}, updating")
-            await self.update_all()
 
             if self.g.is_over():
                 logger.info("Exiting run_round loop, round is over")
@@ -240,14 +240,16 @@ class GameController:
 
             if new_hand is not None:
                 cur_hand, last_player = new_hand, new_player
-                cur_round.append(cur_hand)
+                self.g.register_hand(cur_hand.serialize())
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
                 # TODO: frontend auto pass if they can't go
                 logger.info(f"{self.g.players[self.g.current_player]} wins the round")
-                self.g.register_round(cur_round)
+                self.g.register_round()
                 break
+
+            await self.update_all()
 
     def deal_cards(self) -> None:
         for i in range(3):

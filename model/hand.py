@@ -52,6 +52,9 @@ class Hand(BaseModel):
             kicker_cards=kicker_cards,
         )
 
+    def serialize(self):
+        return self.model_dump(mode="json")
+
     @staticmethod
     def longest_consecutive_chain(nums: List[int]) -> int:
         # Returns the largest consecutive chain in the list of ints

@@ -20,6 +20,7 @@ class Game(BaseModel):
     blind: Optional[List[int]] = None
     deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
     rounds: List[List[int]] = []
+    cur_round: List[Hand] = []
     started: bool = False
     scoreboard: Dict = {}
     game_count: int = 0
@@ -61,6 +62,12 @@ class Game(BaseModel):
 
     def next_player(self):
         self.current_player = (self.current_player + 1) % 3
+
+    def initialize_round(self):
+        self.cur_round = []
+
+    def register_hand(self, h: Hand):
+        self.cur_round.append(h)
 
     def register_round(self, r: List[Hand]):
         self.rounds.append(r)
@@ -116,6 +123,8 @@ class Game(BaseModel):
             "action": "update",
             "current_player": self.current_player,
             "scoreboard": self.scoreboard,
+            "cur_round": self.cur_round,
+            "bid": self.bid,
         }
 
         return new_dict
