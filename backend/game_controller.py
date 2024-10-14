@@ -173,13 +173,13 @@ class GameController:
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
         # send landlord renew request
-        msg = {"action": "game_over"}
-        await self.send_personal_message(self.g.landlord, msg)
-        response = await self.wait_for_message(self.g.landlord, msg)
+        # msg = {"action": "game_over"}
+        # await self.send_personal_message(self.g.landlord, msg)
+        # response = await self.wait_for_message(self.g.landlord, msg)
+        # logger.info(f"Renew game response was {response}")
+        # if response["decision"] == True:
 
-        logger.info(f"Renew game response was {response}")
-        if response["decision"] == True:
-            await self.play_again()
+        await self.play_again()
 
     async def play_again(self) -> None:
         logger.info(f"Resetting game and starting over.")
