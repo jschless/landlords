@@ -212,7 +212,6 @@ class Hand(BaseModel):
             if freq >= self.base and num > self.low:
                 card_freqs[num] = freq
 
-        print(card_freqs)
         # try to build chains starting from each combo
         final_hands = []
 
@@ -222,13 +221,11 @@ class Hand(BaseModel):
                 final_hands.append(temp)
 
         possible_combos = []
-        print(f"Final hands: {final_hands}")
         if self.kicker_len != 0:
             for h in final_hands:
                 final_kickers = self.room_for_kicker(
                     cards, h, self.kicker_base, self.kicker_len
                 )
-                print(f"kicker options are {final_kickers}")
 
                 possible_combos += [(h, kick) for kick in final_kickers]
         else:
