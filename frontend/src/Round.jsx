@@ -4,22 +4,13 @@ import { Box, Flex, Image, Text, Heading } from "@chakra-ui/react";
 const Round = ({ hands, bidValue, currentPlayer }) => {
   return (
     <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md">
-      {/* Header displaying bid value, hand type, and current player's turn */}
-      <Box mb={4}>
-        <Heading as="h4" size="md" color="teal.500">
-          Bid Value: {bidValue}
-        </Heading>
-        <Text fontSize="lg" fontWeight="bold">
-          Hand Type: {hands.length > 0 ? hands[0].string_repr : "None"}
-        </Text>
-        <Text fontSize="lg" fontWeight="bold" color="blue.500">
-          It's {currentPlayer}'s turn!
-        </Text>
-      </Box>
 
       <Flex direction="column" alignItems="center">
-        {hands.map((hand, index) => (
+      {hands.map(([player, hand], index) => (
           <Flex key={index} alignItems="center" mb={4}>
+            <Text p={0} m={2}>
+              {player}
+            </Text>
             <Flex
               direction="column"
               alignItems="center"

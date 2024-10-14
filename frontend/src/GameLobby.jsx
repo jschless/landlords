@@ -7,9 +7,10 @@ import Round from "./Round";
 import Scoreboard from "./Scoreboard";
 import AlertMessage from "./AlertMessage";
 import WaitingPage from "./WaitingPage";
+import  RoundInfo from "./RoundInfo";
 import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react'
 
-const testMode = true;
+const testMode = false;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -36,106 +37,96 @@ function GameLobby() {
 
 
   const testGameData = {
-    "game_id": "2DVWO",
-    "username": "Brittany Robinson",
+    "game_id": "JFV4W",
+    "username": "Travis Gregory",
     "my_cards": [
+        3,
+        3,
         4,
-        5,
-        5,
-        6,
-        6,
-        7,
-        7,
         8,
         9,
         9,
         10,
         10,
-        11,
-        11,
+        10,
+        10,
         12,
+        12,
+        13,
         14,
+        14,
+        15,
         15
     ],
     "players": [
         {
-            "username": "Benjamin Johnson MD",
-            "n_cards": 18,
+            "username": "Sarah Yang",
+            "n_cards": 16,
             "exposed_cards": [
-                3,
-                7
+                12,
+                13,
+                15
             ]
         },
         {
-            "username": "Joseph Jones",
-            "n_cards": 17,
+            "username": "Calvin Logan",
+            "n_cards": 13,
             "exposed_cards": []
         }
     ],
     "landlord": 1,
+    "landlord_username": "Sarah Yang",
     "started": true,
     "action": "update",
-    "current_player": 2,
+    "current_player": 1,
+    "current_player_username": "Sarah Yang",
     "scoreboard": {
-        "Brittany Robinson": 0,
-        "Benjamin Johnson MD": 0,
-        "Joseph Jones": 0
+        "Travis Gregory": 0,
+        "Sarah Yang": 0,
+        "Calvin Logan": 0
     },
     "cur_round": [
-        {
-            "base": 5,
-            "chain_length": 1,
-            "low": 16,
-            "kicker_base": 0,
-            "kicker_len": 0,
-            "hand_cards": [
-                16,
-                17
-            ],
-            "kicker_cards": [],
-
-        },
-                {
-            "base": 5,
-            "chain_length": 1,
-            "low": 16,
-            "kicker_base": 0,
-            "kicker_len": 0,
-            "hand_cards": [
-                4,
-                4,4,4
-            ],
-                    "kicker_cards": [3, 3, 4,4]
-                },
-                {
-            "base": 5,
-            "chain_length": 1,
-            "low": 16,
-            "kicker_base": 0,
-            "kicker_len": 0,
-            "hand_cards": [
-                4,5,6,7,8,9,10,11,12,13,14,15,16,17
-            ],
-            "kicker_cards": []
-                },
-                        {
-            "base": 5,
-            "chain_length": 1,
-            "low": 16,
-            "kicker_base": 0,
-            "kicker_len": 0,
-            "hand_cards": [
-                16,
-                17
-            ],
-            "kicker_cards": []
-        }
-
-
-
+        [
+            "Papa",
+            {
+                "base": 3,
+                "chain_length": 1,
+                "low": 4,
+                "kicker_base": 1,
+                "kicker_len": 1,
+                "hand_cards": [
+                    4,
+                    4,
+                    4
+                ],
+                "kicker_cards": [
+                    3
+                ],
+                "string_repr": "triple-1-chain with 1 single discards"
+            }
+        ],
+        [
+            "Mama",
+            {
+                "base": 3,
+                "chain_length": 1,
+                "low": 7,
+                "kicker_base": 1,
+                "kicker_len": 1,
+                "hand_cards": [
+                    7,
+                    7,
+                    7
+                ],
+                "kicker_cards": [
+                    3
+                ],
+                "string_repr": "triple-1-chain with 1 single discards"
+            }
+        ]
     ],
-    "bid": 2
-  }
+    "bid": 3
+}
   
     
 
@@ -162,17 +153,17 @@ function GameLobby() {
           setLoading(false);
           setPromptMove(false);
           setPromptBet(false);
-          setShowAlert(true);
-          setAlertMessage("Test alert: you made a bad move");
-          setTimeout(() => { 
-              setShowAlert(false);
-              // setShowAlert(true);
-          }, 3000); // 3000 ms = 3 seconds
-          setTimeout(() => {
-              setAlertMessage("Test 2");
-              setShowAlert(true);
-              // setShowAlert(true);
-          }, 4000); // 3000 ms = 3 seconds
+          // setShowAlert(true);
+          // setAlertMessage("Test alert: you made a bad move");
+          // setTimeout(() => { 
+          //     setShowAlert(false);
+          //     // setShowAlert(true);
+          // }, 3000); // 3000 ms = 3 seconds
+          // setTimeout(() => {
+          //     setAlertMessage("Test 2");
+          //     setShowAlert(true);
+          //     // setShowAlert(true);
+          // }, 4000); // 3000 ms = 3 seconds
 
           // setShowAlert(false);
       } else {
@@ -270,6 +261,8 @@ function GameLobby() {
       </Flex>
 
                 {showAlert && <AlertMessage message={alertMessage} />}
+
+                <RoundInfo gameData={gameData}/>
 
       {/* Opponent Hands and Round Display */}
                 <Flex justify="space-between" p={4} gap={4}>

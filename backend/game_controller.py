@@ -254,7 +254,7 @@ class GameController:
                 # The round is over because the last two people passed
                 # TODO: frontend auto pass if they can't go
                 logger.info(f"{self.g.players[self.g.current_player]} wins the round")
-                self.alert_all(
+                await self.alert_all(
                     f"{self.g.players[self.g.current_player].username} wins the round"
                 )
                 self.g.register_round()
