@@ -1,7 +1,8 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from collections import Counter
 
 from pydantic import BaseModel, conint
+import itertools
 
 """
 doudizhu hand types:
@@ -199,3 +200,74 @@ class Hand(BaseModel):
             return f"{self.kicker_len} pair discards"
 
         raise ValueError("Should not be reachable")
+
+    def possible_hands(self, cards: List[int]) -> List["Hand"]:
+        # Generates the possible hands that can work for a given hand set
+
+        c = Counter(cards)
+
+        # prune things less than base
+        card_freqs = {}
+        for num, freq in c.items():
+            if freq >= self.base and num > self.low:
+                card_freqs[num] = freq
+
+        print(card_freqs)
+        # try to build chains starting from each combo
+        final_hands = []
+
+        for num, freq in card_freqs.items():
+            temp = can_build_chain(card_freqs, num, self.chain_length, self.base)
+            if temp is not None:
+                final_hands.append(temp)
+
+        possible_combos = []
+        print(f"Final hands: {final_hands}")
+        if self.kicker_len != 0:
+            for h in final_hands:
+                final_kickers = self.room_for_kicker(
+                    cards, h, self.kicker_base, self.kicker_len
+                )
+                print(f"kicker options are {final_kickers}")
+
+                possible_combos += [(h, kick) for kick in final_kickers]
+        else:
+            possible_combos = [(h, []) for h in final_hands]
+
+        if 16 in cards and 17 in cards:
+            possible_combos.append(([16, 17], []))
+
+        return possible_combos
+
+    def room_for_kicker(self, cards, test_hand, kicker_base, kicker_size):
+        # remove
+        if kicker_base == 0:
+            return []
+        temp_cards = cards[:]
+        for c in test_hand:
+            temp_cards.remove(c)
+
+        c = {
+            num: freq
+            for num, freq in Counter(temp_cards).items()
+            if freq >= kicker_base
+        }
+        if len(c) >= kicker_size:
+            # get all permutations
+            kicker_options = []
+            for combo in itertools.combinations(c.keys(), kicker_size):
+                kicker_options.append(sorted(list(combo) * kicker_base))
+            return kicker_options
+
+        return []
+
+
+def can_build_chain(freqs: Dict[int, int], start: int, length: int, freq: int) -> bool:
+    # Returns the largest consecutive chain in the list of ints
+    chain = [start] * freq
+    for i in range(1, length):
+        if start + i not in freqs:
+            return None
+        else:
+            chain += [start + i] * freq
+    return chain
