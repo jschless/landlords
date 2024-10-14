@@ -8,9 +8,10 @@ import Scoreboard from "./Scoreboard";
 import AlertMessage from "./AlertMessage";
 import WaitingPage from "./WaitingPage";
 import  RoundInfo from "./RoundInfo";
-import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react'
-
-const testMode = false;
+import RoundHistory from "./RoundHistory";
+import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react';
+import { completeGameTestData } from "./test_sets.js";
+const testMode = true;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -36,97 +37,6 @@ function GameLobby() {
     const [showAlert, setShowAlert] = useState(false); 
 
 
-  const testGameData = {
-    "game_id": "JFV4W",
-    "username": "Travis Gregory",
-    "my_cards": [
-        3,
-        3,
-        4,
-        8,
-        9,
-        9,
-        10,
-        10,
-        10,
-        10,
-        12,
-        12,
-        13,
-        14,
-        14,
-        15,
-        15
-    ],
-    "players": [
-        {
-            "username": "Sarah Yang",
-            "n_cards": 16,
-            "exposed_cards": [
-                12,
-                13,
-                15
-            ]
-        },
-        {
-            "username": "Calvin Logan",
-            "n_cards": 13,
-            "exposed_cards": []
-        }
-    ],
-    "landlord": 1,
-    "landlord_username": "Sarah Yang",
-    "started": true,
-    "action": "update",
-    "current_player": 1,
-    "current_player_username": "Sarah Yang",
-    "scoreboard": {
-        "Travis Gregory": 0,
-        "Sarah Yang": 0,
-        "Calvin Logan": 0
-    },
-    "cur_round": [
-        [
-            "Papa",
-            {
-                "base": 3,
-                "chain_length": 1,
-                "low": 4,
-                "kicker_base": 1,
-                "kicker_len": 1,
-                "hand_cards": [
-                    4,
-                    4,
-                    4
-                ],
-                "kicker_cards": [
-                    3
-                ],
-                "string_repr": "triple-1-chain with 1 single discards"
-            }
-        ],
-        [
-            "Mama",
-            {
-                "base": 3,
-                "chain_length": 1,
-                "low": 7,
-                "kicker_base": 1,
-                "kicker_len": 1,
-                "hand_cards": [
-                    7,
-                    7,
-                    7
-                ],
-                "kicker_cards": [
-                    3
-                ],
-                "string_repr": "triple-1-chain with 1 single discards"
-            }
-        ]
-    ],
-    "bid": 3
-}
   
     
 
@@ -149,7 +59,7 @@ function GameLobby() {
     };
 
       if (testMode){
-          setGameData(testGameData);
+          setGameData(completeGameTestData);
           setLoading(false);
           setPromptMove(false);
           setPromptBet(false);
@@ -257,7 +167,7 @@ function GameLobby() {
         
         <Heading size="lg">Game Lobby: {gameData.game_id}</Heading>
         
-        <Box>Placeholder for Chat</Box>
+        <RoundHistory roundHistory={gameData.round_history}/>
       </Flex>
 
                 {showAlert && <AlertMessage message={alertMessage} />}

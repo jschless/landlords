@@ -14,6 +14,7 @@ function RoundInfo({ gameData }) {
       p={4}
       borderWidth={1}
       borderRadius="md"
+      m={2}
       borderColor={useColorModeValue("gray.200", "gray.700")}
       bg={useColorModeValue("white", "gray.800")}
       boxShadow="md"

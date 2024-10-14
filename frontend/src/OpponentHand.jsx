@@ -15,6 +15,7 @@ function OpponentHand({ username, exposedCards, nCards }) {
       p={3} // Padding for some space inside the box
       transition="0.2s" // Transition for hover effects
       _hover={{ shadow: "lg", bg: "gray.50" }} // Hover effect
+      flex="1"
     >
       <Text as="h3" fontSize="lg" fontWeight="bold" mb={8}>
         {username}
