@@ -204,32 +204,32 @@ class Hand(BaseModel):
     def possible_hands(self, cards: List[int]) -> List["Hand"]:
         # Generates the possible hands that can work for a given hand set
 
-        c = Counter(cards)
-
-        # prune things less than base
-        card_freqs = {}
-        for num, freq in c.items():
-            if freq >= self.base and num > self.low:
-                card_freqs[num] = freq
+        # prune things less than base or less than low
+        card_freqs = {
+            num: freq
+            for num, freq in Counter(cards).items()
+            if freq >= self.base and num > self.low
+        }
 
         # try to build chains starting from each combo
-        final_hands = []
+        final_hands = [
+            can_build_chain(card_freqs, num, self.chain_length, self.base)
+            for num in card_freqs
+            if can_build_chain(card_freqs, num, self.chain_length, self.base)
+        ]
 
-        for num, freq in card_freqs.items():
-            temp = can_build_chain(card_freqs, num, self.chain_length, self.base)
-            if temp is not None:
-                final_hands.append(temp)
+        final_hands = [x for x in final_hands if x is not None]
 
         possible_combos = []
         if self.kicker_len != 0:
-            for h in final_hands:
+            for hand in final_hands:
                 final_kickers = self.room_for_kicker(
-                    cards, h, self.kicker_base, self.kicker_len
+                    cards, hand, self.kicker_base, self.kicker_len
                 )
 
-                possible_combos += [(h, kick) for kick in final_kickers]
+                possible_combos.extend((hand, kick) for kick in final_kickers)
         else:
-            possible_combos = [(h, []) for h in final_hands]
+            possible_combos = [(hand, []) for hand in final_hands]
 
         if 16 in cards and 17 in cards:
             possible_combos.append(([16, 17], []))
@@ -237,26 +237,33 @@ class Hand(BaseModel):
         return possible_combos
 
     def room_for_kicker(self, cards, test_hand, kicker_base, kicker_size):
-        # remove
+        # Determines available kickers for given test_hand
         if kicker_base == 0:
             return []
         temp_cards = cards[:]
         for c in test_hand:
             temp_cards.remove(c)
 
-        c = {
+        kicker_freqs = {
             num: freq
             for num, freq in Counter(temp_cards).items()
             if freq >= kicker_base
         }
-        if len(c) >= kicker_size:
-            # get all permutations
-            kicker_options = []
-            for combo in itertools.combinations(c.keys(), kicker_size):
-                kicker_options.append(sorted(list(combo) * kicker_base))
-            return kicker_options
+        if len(kicker_freqs) < kicker_size:
+            return []
 
-        return []
+        # Generate all combinations of kickers
+        return [
+            sorted(list(combo) * kicker_base)
+            for combo in itertools.combinations(kicker_freqs.keys(), kicker_size)
+        ]
+
+    @classmethod
+    def suggest_moves(cls, h, cards):
+        if h is None:
+            return []
+        temp = h.possible_hands(cards)
+        return [cls.parse_hand(hand, kick).serialize() for hand, kick in temp]
 
 
 def can_build_chain(freqs: Dict[int, int], start: int, length: int, freq: int) -> bool:
@@ -265,6 +272,5 @@ def can_build_chain(freqs: Dict[int, int], start: int, length: int, freq: int) -
     for i in range(1, length):
         if start + i not in freqs:
             return None
-        else:
-            chain += [start + i] * freq
+        chain.extend([start + i] * freq)
     return chain
