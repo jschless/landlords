@@ -29,6 +29,7 @@ class Player(BaseModel):
     def make_landlord(self, cards: List[int]) -> None:
         self.cards += cards
         self.exposed_cards += cards
+        self.cards.sort()
 
     def remove_cards(self, cards: List[int]) -> None:
         for c in cards:
