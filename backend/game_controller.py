@@ -31,6 +31,7 @@ class GameController:
         self.active_connections: List[WebSocket] = []
         self.player_to_connection: Dict[int, WebSocket] = {}
         self.message_queue: asyncio.Queue = asyncio.Queue()
+        self.awaiting_from: Dict[str, Dict] = {}
 
     async def connect(self, websocket: WebSocket, uid: str) -> None:
         logger.info(f"Current connections: {self.active_connections}")
@@ -44,6 +45,15 @@ class GameController:
             )
             self.active_connections.append(websocket)
             await websocket.accept()
+            await self.update_all()
+
+            # Resend message if we were awaiting a response and disconnect took place
+            if uid in self.awaiting_from:
+                logger.info("Resending message")
+                await self.send_personal_message(
+                    self.uid_to_player[uid], self.awaiting_from[uid]
+                )
+
         else:
             self.add_player(websocket, None, uid)
             await websocket.accept()
@@ -72,15 +82,24 @@ class GameController:
 
     ### COMMUNICATION FUNCTIONS
 
-    async def wait_for_message(self, player_id: int, action: str) -> Dict:
+    async def wait_for_message(self, player_id: int, msg: Dict) -> Dict:
         """Retrieve a message from the queue for the given player_id."""
-        logger.info(f"Call to wait_for_message from {player_id} with action {action}")
+        logger.info(
+            f"Call to wait_for_message from {player_id} with action {msg['action']}"
+        )
+        self.awaiting_from[self.player_to_uid(player_id)] = msg
+        temp_mapper = {
+            "make_a_bid": "bet",
+            "make_a_move": "move",
+            "game_over": "play_again",
+        }
         while True:
             p_id, message_action, message = await self.message_queue.get()
             logger.info(
                 f"Wait for message received this {p_id}, {message_action}, {message}"
             )
-            if p_id == player_id and message_action == action:
+            if p_id == player_id and message_action == temp_mapper[msg["action"]]:
+                del self.awaiting_from[self.player_to_uid(player_id)]
                 return message
 
     async def listen_for_messages(self, websocket: WebSocket, uid: str) -> None:
@@ -101,6 +120,14 @@ class GameController:
             self.disconnect(websocket)
 
     async def send_personal_message(self, player_id: int, message: Dict) -> None:
+        if message is None:
+            return
+        if self.player_to_connection[player_id] not in self.active_connections:
+            logger.info(
+                f"Player {player_id} is not currently connected... trying again in 1 second"
+            )
+            await asyncio.sleep(1)
+            self.send_personal_message(self, player_id, message)
         try:
             await self.player_to_connection[player_id].send_text(json.dumps(message))
         except WebSocketDisconnect:
@@ -136,8 +163,9 @@ class GameController:
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
         # send landlord renew request
-        await self.send_personal_message(self.g.landlord, {"action": "game_over"})
-        response = await self.wait_for_message(self.g.landlord, "play_again")
+        msg = {"action": "game_over"}
+        await self.send_personal_message(self.g.landlord, msg)
+        response = await self.wait_for_message(self.g.landlord, msg)
 
         logger.info(f"Renew game response was {response}")
         if response["decision"] == True:
@@ -200,7 +228,7 @@ class GameController:
                     logger.info("Submission was malformed or something, try again")
 
             logger.info(f"The following hand was submitted: {new_hand}, updating")
-            self.update_all()
+            await self.update_all()
 
             if self.g.is_over():
                 logger.info("Exiting run_round loop, round is over")
@@ -236,11 +264,9 @@ class GameController:
         for i in range(3):
             player_id = (self.g.current_player + i) % 3
             logger.info(f"Sending bid solicitation to player {i}")
-            await self.send_personal_message(
-                player_id,
-                {"action": "make_a_bid", "last_bid": highest_bid},
-            )
-            bid_json = await self.wait_for_message(player_id, "bet")
+            msg = {"action": "make_a_bid", "last_bid": highest_bid}
+            await self.send_personal_message(player_id, msg)
+            bid_json = await self.wait_for_message(player_id, msg)
             bid = int(bid_json["bet"])
 
             if bid > highest_bid:
@@ -272,11 +298,9 @@ class GameController:
 
         serializable_hand = None if h is None else h.model_dump(mode="json")
 
-        await self.send_personal_message(
-            self.g.current_player,
-            {"action": "make_a_move", "last_hand": serializable_hand},
-        )
-        new_hand_json = await self.wait_for_message(self.g.current_player, "move")
+        msg = {"action": "make_a_move", "last_hand": serializable_hand}
+        await self.send_personal_message(self.g.current_player, msg)
+        new_hand_json = await self.wait_for_message(self.g.current_player, msg)
         new_hand = self.parse_move(new_hand_json)
         logger.info(f"Parsed move of {new_hand}")
 

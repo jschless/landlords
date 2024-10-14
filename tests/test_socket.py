@@ -113,9 +113,6 @@ async def test_two_rounds(fastapi_server):
     results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
     tom, dick, harry = tuple(results)
     assert harry["scoreboard"][harry["username"]] == 24
-    # assert len(harry["my_cards"]) == 0
-    # tom = next((x for x in results if x["username"] == "Tom_U"), None)
-    # assert len(tom["my_cards"]) == 17
 
 
 @pytest.mark.asyncio
@@ -123,7 +120,6 @@ async def test_invalid_start_move(fastapi_server):
     p1 = [
         {"action": "bet", "bet": "1"},
         format_move([6, 7, 8, 9, 10], []),
-        format_move([], []),
     ]
     p2 = [
         {"action": "bet", "bet": "2"},
@@ -140,9 +136,10 @@ async def test_invalid_start_move(fastapi_server):
     results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
 
     # So Tom should be current_play
-
     tom, dick, harry = tuple(results)
+
     assert tom["current_player"] == 0
+
     assert len(harry["my_cards"]) == 15
     assert len(tom["my_cards"]) == 12
     assert len(dick["my_cards"]) == 17
@@ -158,13 +155,11 @@ async def test_invalid_following_move(fastapi_server):
     p2 = [
         {"action": "bet", "bet": "2"},
         format_move([], []),
-        format_move([], []),
     ]
     p3 = [
         {"action": "bet", "bet": "3"},
         format_move([3, 5, 6, 7, 8], []),  # bad move
         format_move([3, 4, 5, 6, 7], []),  # correct move
-        format_move([], []),
     ]
 
     results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
@@ -182,7 +177,6 @@ async def test_invalid_following_move_2(fastapi_server):
     p1 = [
         {"action": "bet", "bet": "3"},
         format_move([6, 7, 8, 9, 10, 11], []),
-        format_move([], []),
     ]
     p2 = [
         format_move([], []),
@@ -262,3 +256,9 @@ async def test_submitting_fake_cards(fastapi_server):
 async def test_submitting_bad_kicker():
     # TODO: add a new test deal that has more exciting card combos
     pass
+
+
+@pytest.mark.asyncio
+async def test_start_round_with_pass():
+    # TODO: add a new test deal that has more exciting card combos
+    assert True == False
