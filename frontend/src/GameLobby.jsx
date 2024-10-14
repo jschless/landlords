@@ -127,9 +127,10 @@ function GameLobby() {
               currently here:
             </h2>
             <ul>
+              <li key="0">{gameData.username}</li>
               {gameData.players.map((player, index) => (
-                <li key={index}>{player.username}</li>
-              ))}
+                <li key={index+1}>{player.username}</li>
+              ))}          
             </ul>
           </div>
         )}
