@@ -176,14 +176,14 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        # send landlord renew request
-        # msg = {"action": "game_over"}
-        # await self.send_personal_message(self.g.landlord, msg)
-        # response = await self.wait_for_message(self.g.landlord, msg)
-        # logger.info(f"Renew game response was {response}")
-        # if response["decision"] == True:
-
-        await self.play_again()
+        if os.getenv("TEST") == "True":
+            # For better control over when the tests start
+            msg = {"action": "game_over"}
+            await self.send_personal_message(self.g.landlord, msg)
+            response = await self.wait_for_message(self.g.landlord, msg)
+            logger.info(f"Renew game response was {response}")
+            if response["decision"] == True:
+                await self.play_again()
 
     async def play_again(self) -> None:
         logger.info(f"Resetting game and starting over.")
@@ -222,7 +222,9 @@ class GameController:
         # first turn establishes hand type
         self.g.initialize_round()
         cur_hand, last_player = None, None
+
         while True:
+            new_hand = None
             for _ in range(3):
                 # need to get the right thing from a player, so give them 3 chances then pass
                 # TODO: frontend validation and timeout
@@ -243,6 +245,8 @@ class GameController:
                     )
 
             logger.info(f"The following hand was submitted: {new_hand}, updating")
+
+            self.g.next_player()
 
             if self.g.is_over():
                 logger.info("Exiting run_round loop, round is over")
@@ -336,19 +340,22 @@ class GameController:
         cur_player = self.g.current_player
 
         if new_hand is None:
-            self.g.next_player()
+            # Player submitted a pass
             return None, cur_player
         elif h is None or h.is_valid_successor(new_hand):
+            # Player submitted a valid hand and there was no round type defined,
+            # or they followed a move and it was a valid hand
+
             logger.info(f"New hand is {new_hand}, old hand was {h}")
             # remove cards
             if new_hand.is_bomb():
                 self.g.bid *= 2
                 logger.info(f"Bomb was dropped, bid is now {self.g.bid}")
+
             self.g.players[self.g.current_player].remove_cards(
                 new_hand.hand_cards + new_hand.kicker_cards
             )
             await self.update_all()
-            self.g.next_player()
             return new_hand, cur_player
         else:
             logger.info(
