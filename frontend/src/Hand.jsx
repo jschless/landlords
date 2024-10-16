@@ -47,7 +47,8 @@ function Hand({ myCards, onSubmit, promptMove }) {
       >
       
         {myCards.map((card, index) => (
-          <Image
+            <Image
+              key={index}
             src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
             alt={`Card ${card}`}
             boxSize="80px"

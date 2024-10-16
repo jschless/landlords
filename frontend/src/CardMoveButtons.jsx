@@ -8,9 +8,9 @@ const CardMoveButtons = ({ possibleMoves, handleMove }) => {
         <Flex width="100%" justify="center" wrap="wrap"> {/* Centered */}
             <ButtonGroup spacing={4}> {/* Added spacing for buttons */}
                 {possibleMoves.map((move, index) => {
-                    const handCardImages = move.hand_cards.map(card => (
-                        <Image 
-                            key={card}
+                    const handCardImages = move.hand_cards.map((card, index) => (
+                        <Image
+                          key={`${card}-${index}`}
                             src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
                             alt={`Card ${card}`} 
                             boxSize="50px" 
@@ -18,10 +18,10 @@ const CardMoveButtons = ({ possibleMoves, handleMove }) => {
                         />
                     ));
 
-                    const kickerCardImages = move.kicker_cards.map(card => (
+                    const kickerCardImages = move.kicker_cards.map((card, index) => (
                         <Image 
-                            key={card}
-                            src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
+                          key={`${card}-${index}`}
+                          src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
                             alt={`Kicker ${card}`} 
                             boxSize="40px" 
                             margin="0 2" 
@@ -29,8 +29,8 @@ const CardMoveButtons = ({ possibleMoves, handleMove }) => {
                     ));
 
                     return (
-                        <Button 
-                            key={index} 
+                        <Button
+                          key={index}
                             onClick={() => handleMove(move)}
                             marginY={2} 
                         >
