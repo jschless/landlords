@@ -231,9 +231,8 @@ class GameController:
 
         while True:
             new_hand = None
-            for _ in range(3):
+            for i in range(3):
                 # need to get the right thing from a player, so give them 3 chances then pass
-                # TODO: frontend validation and timeout
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
                     # break for loop if this is valid
@@ -246,7 +245,7 @@ class GameController:
                         self.g.current_player,
                         {
                             "action": "alert",
-                            "message": f"That was an improper hand. You need to submit something of type {cur_hand}",
+                            "message": f"That was an improper hand. You need to submit something of type {cur_hand}.<br>{2-i} attempts remaining.",
                         },
                     )
 

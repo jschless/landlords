@@ -265,6 +265,27 @@ async def test_start_round_with_pass():
 
 
 @pytest.mark.asyncio
-async def test_submit_bad_hands_3_times():
-    # TODO: add a new test deal that has more exciting card combos
-    assert True == False
+async def test_submit_bad_hands_3_times(fastapi_server):
+    p1 = [
+        {"action": "bet", "bet": "1"},
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([12], []),
+    ]
+    p2 = [
+        {"action": "bet", "bet": "2"},
+        format_move([], []),
+    ]
+    p3 = [
+        {"action": "bet", "bet": "3"},
+        format_move([11], []),
+    ]
+
+    results = await execute_moves_multiple(fastapi_server, [(p1, p2, p3)])
+
+    tom, dick, harry = tuple(results)
+
+    assert len(harry["my_cards"]) == 19
+    assert len(tom["my_cards"]) == 17
+    assert len(dick["my_cards"]) == 17
