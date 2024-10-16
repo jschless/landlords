@@ -9,6 +9,7 @@ class TestGame:
             "game_id": "569IR",
             "username": "Harry_U",
             "current_player": 0,
+            "current_player_uid": "Tom",
             "scoreboard": {},
             "my_cards": [
                 3,
