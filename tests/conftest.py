@@ -27,13 +27,9 @@ def fastapi_server():
 def complete_game_p3_blowout():
     p1 = [
         {"action": "bet", "bet": "1"},
-        format_move([], []),
-        format_move([], []),
     ]
     p2 = [
         {"action": "bet", "bet": "2"},
-        format_move([], []),
-        format_move([], []),
     ]
     p3 = [
         {"action": "bet", "bet": "3"},
