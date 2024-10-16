@@ -262,3 +262,9 @@ async def test_submitting_bad_kicker():
 async def test_start_round_with_pass():
     # TODO: add a new test deal that has more exciting card combos
     assert True == False
+
+
+@pytest.mark.asyncio
+async def test_submit_bad_hands_3_times():
+    # TODO: add a new test deal that has more exciting card combos
+    assert True == False
