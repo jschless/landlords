@@ -5,11 +5,7 @@ import websockets
 
 
 def format_move(cards, kickers):
-    return {
-        "action": "move",
-        "cards": [{"card": c} for c in cards],
-        "kickers": [{"card": c} for c in kickers],
-    }
+    return {"action": "move", "cards": cards, "kickers": kickers}
 
 
 async def execute_moves_multiple(
