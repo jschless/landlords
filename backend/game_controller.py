@@ -119,7 +119,13 @@ class GameController:
             logger.info(f"Disconnect while listening for messages for {player_id}")
             self.disconnect(websocket)
 
-    async def send_personal_message(self, player_id: int, message: Dict) -> None:
+    async def send_personal_message(
+        self, player_id: int, message: Dict, attempt_number: int = 0
+    ) -> None:
+        if attempt_number > 30:
+            logger.error(
+                f"Could not send message {message} to {player_id} over past 30 seconds"
+            )
         if message is None:
             return
         if self.player_to_connection[player_id] not in self.active_connections:
@@ -127,7 +133,7 @@ class GameController:
                 f"Player {player_id} is not currently connected... trying again in 1 second"
             )
             await asyncio.sleep(1)
-            self.send_personal_message(player_id, message)
+            self.send_personal_message(player_id, message, attempt_number + 1)
         try:
             await self.player_to_connection[player_id].send_text(json.dumps(message))
         except WebSocketDisconnect:
