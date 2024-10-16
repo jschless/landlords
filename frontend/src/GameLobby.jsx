@@ -10,6 +10,7 @@ import WaitingPage from "./WaitingPage";
 import RoundInfo from "./RoundInfo";
 import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
+import CardMoveButtons from "./CardMoveButtons";
 import { Heading, Text, Container, Highlight, Box, Flex, List, ListItem } from '@chakra-ui/react';
 import { completeGameTestData } from "./test_sets.js";
 const testMode = false;
@@ -37,9 +38,8 @@ function GameLobby() {
     const [alertMessage, setAlertMessage] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const [uniqueId, setUniqueId] = useState(""); // Add uniqueId to the state
-
-
-  
+    const [possibleMoves, setPossibleMoves] = useState(null);
+    
     
 
   useEffect(() => {
@@ -112,8 +112,10 @@ function GameLobby() {
               setShowAlert(false);
           }, 3000);
       } else if (message.action === "make_a_move") {
-        // Prompt player for move
-        setPromptMove(true);
+          // Prompt player for move
+          console.log("REQUEST FOR MOVE", message);
+          setPossibleMoves(message.possible_moves);
+          setPromptMove(true);
       } else if (message.action === "make_a_bid") {
         // Prompt for a bet
         setLastBid(message.last_bid);
@@ -136,14 +138,28 @@ function GameLobby() {
     if (socket && promptMove) {
       const message = {
         action: "move",
-        cards: selectedCards,
-        kickers: selectedKickers,
+        cards: selectedCards.map(c => c.card),
+        kickers: selectedKickers.map(c => c.card),
       };
       console.log("Sending selected cards:", message);
       socket.send(JSON.stringify(message));
       setPromptMove(false);
     }
   };
+
+    const handleMove = (move) => {
+        if (socket && promptMove) {
+            const message = {
+                action: "move",
+                cards: move.hand_cards,
+                kickers: move.kicker_cards,
+      };
+      console.log("Sending selected cards:", message);
+      socket.send(JSON.stringify(message));
+      setPromptMove(false);        // Implement your move handling logic here
+      }
+    };
+
 
   const submitBet = (bet) => {
     if (socket && bet) {
@@ -208,6 +224,8 @@ function GameLobby() {
           promptMove={promptMove}
           onSubmit={submitMove}
         />
+
+                {possibleMoves && possibleMoves.length > 0 && promptMove && <CardMoveButtons possibleMoves={possibleMoves} handleMove={handleMove} />}
                 
       {/* Bet Component */}
       {promptBet && <BetComponent lastBid={lastBid} submitBet={submitBet} />}

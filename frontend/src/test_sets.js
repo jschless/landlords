@@ -99,7 +99,7 @@ export const test1 = {
 export const completeGameTestData = {
     "game_id": "CK0BS",
     "username": "Dominic Miller",
-    "my_cards": [],
+    "my_cards": [3,3,4,5,6,7,8,9,10],
     "players": [
         {
             "username": "Carla Munoz",

@@ -306,22 +306,22 @@ class GameController:
             f"Setting landlord as highest_bidder: {highest_bidder}. Bid for round is {self.g.bid}"
         )
 
-    def get_cards_from_json(self, cards_json: List[Dict]) -> List[int]:
-        return [c["card"] for c in cards_json]
-
     def parse_move(self, json_data: Dict) -> Hand:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
-        return Hand.parse_hand(
-            self.get_cards_from_json(json_data["cards"]),
-            self.get_cards_from_json(json_data["kickers"]),
-        )
+        return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
     async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
         # get turn from current_player
 
         serializable_hand = None if h is None else h.model_dump(mode="json")
-
-        msg = {"action": "make_a_move", "last_hand": serializable_hand}
+        possible_moves = Hand.suggest_moves(
+            h, self.g.players[self.g.current_player].cards
+        )
+        msg = {
+            "action": "make_a_move",
+            "last_hand": serializable_hand,
+            "possible_moves": possible_moves[:5],
+        }
         await self.send_personal_message(self.g.current_player, msg)
         new_hand_json = await self.wait_for_message(self.g.current_player, msg)
         new_hand = self.parse_move(new_hand_json)

@@ -5,8 +5,6 @@ function Hand({ myCards, onSubmit, promptMove }) {
   const [selectedCards, setSelectedCards] = useState([]);
     const [selectedKickers, setSelectedKickers] = useState([]);
 
-    console.log("Happening", myCards);
-
   const handleCardClick = (e, card, index) => {
     if (e.button === 0) {
       // Left-click
