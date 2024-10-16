@@ -23,7 +23,7 @@ def fastapi_server():
     server_process.join()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def complete_game_p3_blowout():
     p1 = [
         {"action": "bet", "bet": "1"},
@@ -44,7 +44,7 @@ def complete_game_p3_blowout():
     return (p1, p2, p3)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def complete_game_p1_blowout():
     p1 = [
         {"action": "bet", "bet": "3"},
