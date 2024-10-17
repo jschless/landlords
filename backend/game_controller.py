@@ -191,6 +191,8 @@ class GameController:
             logger.info(f"Renew game response was {response}")
             if response["decision"] == True:
                 await self.play_again()
+        else:
+            await self.play_again()
 
     async def play_again(self) -> None:
         logger.info(f"Resetting game and starting over.")
