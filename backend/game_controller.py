@@ -133,7 +133,8 @@ class GameController:
                 f"Player {player_id} is not currently connected... trying again in 1 second"
             )
             await asyncio.sleep(1)
-            self.send_personal_message(player_id, message, attempt_number + 1)
+            await self.send_personal_message(player_id, message, attempt_number + 1)
+            return
         try:
             await self.player_to_connection[player_id].send_text(json.dumps(message))
         except WebSocketDisconnect:
@@ -341,6 +342,7 @@ class GameController:
             "last_hand": serializable_hand,
             "possible_moves": possible_moves[:5],
         }
+        logger.info(f"Soliciting move from {self.g.current_player}")
         await self.send_personal_message(self.g.current_player, msg)
         new_hand_json = await self.wait_for_message(self.g.current_player, msg)
         new_hand = self.parse_move(new_hand_json)
