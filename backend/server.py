@@ -78,12 +78,18 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     await games[game_id].connect(websocket, user_id)
 
     listen_task = asyncio.create_task(
-        games[game_id].listen_for_messages(websocket, user_id)
+        games[game_id].listen_for_messages(websocket, user_id),
+        name=f"Listener for {user_id}",
     )
     logger.info(f"Backgrounding listen task for {user_id}")
 
-    asyncio.create_task(games[game_id].try_to_start())
-    logger.info(f"Backgrounding try_to_start task for {user_id}")
+    if not games[game_id].g.started:
+        asyncio.create_task(
+            games[game_id].try_to_start(),
+            name=f"Attempting to start after {user_id} joins",
+        )
+        logger.info(f"Backgrounding try_to_start task for {user_id}")
 
     await listen_task
+
     logger.info(f"Finally awaited listen_task for {user_id}")
