@@ -106,58 +106,55 @@ function GameLobby() {
         setGameData(message);
       } else if (message.action === "alert") {
           console.log("RECEIVED ALERT", message);
-          setAlertMessage(message.message);
-          setShowAlert(true);
+          const newAlert =               { id: alertMessages.length, message: message.message };
+          setAlertMessages((prevMessages) => [
+              ...prevMessages,
+              newAlert
+          ]);
+
           setTimeout(() => {
-              setShowAlert(false);
-          }, 3000);
+              setAlertMessages((prevMessages) =>
+                  prevMessages.filter((alert) => alert.id !== newAlert.id)
+              );
+          }, 4000);
       } else if (message.action === "make_a_move") {
-          // Prompt player for move
+          // Prompt player for move          
           console.log("REQUEST FOR MOVE", message);
           setPossibleMoves(message.possible_moves);
           setPromptMove(true);
+          console.log("Initiating timer");
       } else if (message.action === "make_a_bid") {
         // Prompt for a bet
-        setLastBid(message.last_bid);
+          setLastBid(message.last_bid);
         setPromptBet(true);
       }
     };
  
     ws.onclose = () => {
-      console.log("WebSocket connection closed");
+        console.log("WebSocket connection closed");    
     };
 
     setSocket(ws);
 
     return () => {
-      ws.close();
+        ws.close();
+      
     };
   }, [id]);
 
+
+   
+    
   const submitMove = (selectedCards, selectedKickers) => {
-    if (socket && promptMove) {
-      const message = {
-        action: "move",
-        cards: selectedCards.map(c => c.card),
-        kickers: selectedKickers.map(c => c.card),
-      };
-      console.log("Sending selected cards:", message);
-      socket.send(JSON.stringify(message));
-      setPromptMove(false);
-    }
+      if (socket && promptMove) {
+          sendMove(selectedCards.map(c => c.card), selectedKickers.map(c => c.card));
+      }
   };
 
     const handleMove = (move) => {
         if (socket && promptMove) {
-            const message = {
-                action: "move",
-                cards: move.hand_cards,
-                kickers: move.kicker_cards,
-      };
-      console.log("Sending selected cards:", message);
-      socket.send(JSON.stringify(message));
-      setPromptMove(false);        // Implement your move handling logic here
-      }
+            sendMove(move.hand_cards, move.kicker_cards);
+        }
     };
 
 
@@ -189,7 +186,7 @@ function GameLobby() {
         <RoundHistory roundHistory={gameData.round_history}/>
       </Flex>
 
-                {showAlert && <AlertMessage message={alertMessage} />}
+                {alertMessages.length > 0 && <AlertMessage messages={alertMessages} />}
 
                 <TurnBanner gameDataUid={gameData.current_player_uid} uid={uniqueId}/>
                 <RoundInfo gameData={gameData}/>
