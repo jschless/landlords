@@ -2,6 +2,7 @@ import httpx
 import asyncio
 import json
 import websockets
+from datetime import datetime
 
 
 def format_move(cards, kickers):
@@ -24,14 +25,22 @@ async def execute_moves_multiple(
                 try:
                     if reconnect_at_message == len(messages_to_send):
                         break
-                    message = await asyncio.wait_for(websocket.recv(), timeout=2)
+                    message = await asyncio.wait_for(websocket.recv(), timeout=5)
+                    print(f"{user_id}: Received {message}")
                     data = json.loads(message)
                     if data["action"] in {
                         "make_a_bid",
                         "make_a_move",
                         "game_over",
                     }:
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")[:-3]
+                        print(
+                            f"{timestamp} - {user_id}: received call for {message}\nMessage queue is {messages_to_send}"
+                        )
+
                         response = messages_to_send.pop()
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")[:-3]
+                        print(f"{timestamp} - {user_id} sending {response}")
                         await websocket.send(json.dumps(response))
                     elif data["action"] == "update":
                         update = data
@@ -41,6 +50,7 @@ async def execute_moves_multiple(
                 except Exception as e:
                     return update
         if reconnect_at_message == len(messages_to_send):
+            await asyncio.sleep(3)
             return await connect_websocket(game_id, user_id, messages_to_send, 0, -1)
 
     game_ids = []
