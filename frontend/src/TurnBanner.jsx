@@ -10,9 +10,9 @@ function TurnBanner({ gameDataUid, uid }) {
       {isYourTurn && (
         <Box
           bg="green.200" // Light green background
-          p={2}          // Padding to make the banner stand out
+          p={2} // Padding to make the banner stand out
           textAlign="center"
-          width="100%"    // Full-width banner
+          width="100%" // Full-width banner
         >
           <Text fontSize="lg" fontWeight="bold" color="black">
             It's your turn!

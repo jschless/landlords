@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Box, Heading, Text, VStack, Image, Divider, HStack, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Text,
+  VStack,
+  Image,
+  Divider,
+  HStack,
+  Button,
+} from "@chakra-ui/react";
 
 function RoundHistory({ roundHistory }) {
   const [showHistory, setShowHistory] = useState(false);
@@ -9,10 +18,10 @@ function RoundHistory({ roundHistory }) {
   const getTotalCards = (arr) => {
     let totalCards = 0;
 
-    arr.forEach(item => {
+    arr.forEach((item) => {
       const handCards = item[1].hand_cards || [];
       const kickerCards = item[1].kicker_cards || [];
-      
+
       totalCards += handCards.length + kickerCards.length;
     });
 

@@ -41,7 +41,9 @@ function Home() {
           Welcome to the Game!
         </Heading>
         <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
-          This is an interactive card game platform where you can create and join games with friends or other players. Test your skills, enjoy the competition, and have fun!
+          This is an interactive card game platform where you can create and
+          join games with friends or other players. Test your skills, enjoy the
+          competition, and have fun!
         </Text>
         <Button
           onClick={createGame}
@@ -61,8 +63,7 @@ function Home() {
         transform="translateX(-50%)"
         color={useColorModeValue("gray.500", "gray.400")}
         fontSize="sm"
-      >
-      </Box>
+      ></Box>
     </Container>
   );
 }

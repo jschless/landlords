@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Text, Fade } from "@chakra-ui/react";
 
 const AlertMessage = ({ messages }) => {
-
   return (
     <>
       {messages.map((alert) => (

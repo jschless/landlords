@@ -3,7 +3,7 @@ import { Box, Image, Button, Flex } from "@chakra-ui/react";
 
 function Hand({ myCards, onSubmit, promptMove }) {
   const [selectedCards, setSelectedCards] = useState([]);
-    const [selectedKickers, setSelectedKickers] = useState([]);
+  const [selectedKickers, setSelectedKickers] = useState([]);
 
   const handleCardClick = (e, card, index) => {
     if (e.button === 0) {
@@ -45,10 +45,9 @@ function Hand({ myCards, onSubmit, promptMove }) {
         width="100%"
         wrap="wrap"
       >
-      
         {myCards.map((card, index) => (
-            <Image
-              key={index}
+          <Image
+            key={index}
             src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
             alt={`Card ${card}`}
             boxSize="80px"
@@ -57,8 +56,8 @@ function Hand({ myCards, onSubmit, promptMove }) {
               selectedCards.some((c) => c.index === index)
                 ? "3px solid blue"
                 : selectedKickers.some((c) => c.index === index)
-                ? "3px solid orange"
-                : "none"
+                  ? "3px solid orange"
+                  : "none"
             }
             cursor="pointer"
             onClick={(e) => handleCardClick(e, card, index)}

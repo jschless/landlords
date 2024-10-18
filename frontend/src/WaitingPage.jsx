@@ -18,8 +18,9 @@ function WaitingPage({ gameData }) {
           Game Lobby: {gameData.game_id}
         </Heading>
         <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
-              Waiting for {2 - gameData.players.length} player
-          {gameData.players.length === 1 ? "" : "s"} to join. Here's who's currently here:
+          Waiting for {2 - gameData.players.length} player
+          {gameData.players.length === 1 ? "" : "s"} to join. Here's who's
+          currently here:
         </Text>
         <Box
           borderWidth={1}

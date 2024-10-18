@@ -3,16 +3,21 @@ import { Box, Flex, Image, Text, Heading } from "@chakra-ui/react";
 
 const Round = ({ hands, bidValue, currentPlayer }) => {
   return (
-      <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md" flex="3">
-        <Heading>
-          Playing Area
-        </Heading>
+    <Box
+      textAlign="center"
+      p={4}
+      bg="gray.50"
+      borderRadius="md"
+      shadow="md"
+      flex="3"
+    >
+      <Heading>Playing Area</Heading>
 
-      <Flex direction="column" alignItems="center" >
-      {hands.map(([player, hand], index) => (
+      <Flex direction="column" alignItems="center">
+        {hands.map(([player, hand], index) => (
           <Flex key={index} alignItems="center" mb={4}>
             <Text p={0} m={2}>
-              ({index+1}) {player}
+              ({index + 1}) {player}
             </Text>
             <Flex
               direction="column"
@@ -49,7 +54,6 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
               </Flex>
             </Flex>
             <Box width="20px" /> {/* Spacer */}
-
             {/* Conditionally render the kicker section if there are kicker cards */}
             {hand.kicker_cards.length > 0 && (
               <Flex

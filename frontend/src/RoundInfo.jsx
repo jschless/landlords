@@ -1,14 +1,7 @@
 import React from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  Stack,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Heading, Text, Stack, useColorModeValue } from "@chakra-ui/react";
 
 function RoundInfo({ gameData }) {
-
   return (
     <Box
       p={4}
@@ -30,7 +23,10 @@ function RoundInfo({ gameData }) {
           Bet Stakes: {gameData.bid}
         </Text>
         <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
-          Hand Type: {gameData.cur_round.length > 0? gameData.cur_round[0][1].string_repr: "None"}
+          Hand Type:{" "}
+          {gameData.cur_round.length > 0
+            ? gameData.cur_round[0][1].string_repr
+            : "None"}
         </Text>
       </Stack>
     </Box>
