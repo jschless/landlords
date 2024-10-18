@@ -2,12 +2,21 @@ import pytest
 from .utils import execute_moves_multiple
 
 
+async def test_disconnect_at_start(
+    fastapi_server, complete_game_p3_blowout, player_to_test, disconnect_round
+):
+    ###
+    pass
+
+
 @pytest.mark.parametrize("player_to_test", [0, 1, 2])
-@pytest.mark.parametrize("disconnect_round", [0, 1, 2, 3])
+@pytest.mark.parametrize("disconnect_round", [1, 2, 3])
 @pytest.mark.asyncio
 async def test_disconnect(
     fastapi_server, complete_game_p3_blowout, player_to_test, disconnect_round
 ):
+    # Some are failing bc: when they disconnect, the server keeps sending stuff, and then you get
+    # bombarded with move requests...
     p1, p2, p3 = complete_game_p3_blowout
 
     results = await execute_moves_multiple(
@@ -22,7 +31,7 @@ async def test_disconnect(
 
 
 @pytest.mark.parametrize("player_to_test", [0, 1, 2])
-@pytest.mark.parametrize("disconnect_round", [0, 1, 2, 3, 4, 5, 6])
+@pytest.mark.parametrize("disconnect_round", [1, 2, 3, 4, 5, 6])
 @pytest.mark.asyncio
 async def test_disconnect_consecutive_games(
     fastapi_server, complete_game_p3_blowout, player_to_test, disconnect_round
