@@ -296,8 +296,11 @@ class GameController:
     async def determine_landlord(self) -> None:
         # solicit bids one after the other, needs to be in websocket
         highest_bid, highest_bidder = 0, None
+        starting_player = self.g.current_player
         for i in range(3):
-            player_id = (self.g.current_player + i) % 3
+            player_id = (starting_player + i) % 3
+            self.g.current_player = player_id
+            await self.update_all()
             logger.info(f"Sending bid solicitation to player {i}")
             msg = {"action": "make_a_bid", "last_bid": highest_bid}
             await self.send_personal_message(player_id, msg)
