@@ -152,7 +152,7 @@ function GameLobby() {
       ws.close();
       clearInterval(timerRef.current);
     };
-  }, [setUniqueId]);
+  }, []);
 
   // Timer countdown0
   useEffect(() => {

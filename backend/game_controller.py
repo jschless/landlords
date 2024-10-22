@@ -39,10 +39,20 @@ class GameController:
             logger.info(f"No more people can join")
         elif uid in self.uid_to_player:
             # don't add a new user, this is a reconnect
+            # first check if the existing connection is in active connections and remove
+            if (
+                self.player_to_connection[self.uid_to_player[uid]]
+                in self.active_connections
+            ):
+                self.active_connections.remove(
+                    self.player_to_connection[self.uid_to_player[uid]]
+                )
+
             self.player_to_connection[self.uid_to_player[uid]] = websocket
             logger.info(
                 f"{uid} reconnected, switching the player_to_connection mapping {self.player_to_connection}"
             )
+
             self.active_connections.append(websocket)
             await websocket.accept()
             await self.update_all()
@@ -118,6 +128,9 @@ class GameController:
         except WebSocketDisconnect:
             logger.info(f"Disconnect while listening for messages for {player_id}")
             self.disconnect(websocket)
+        except RuntimeError:
+            logger.error(f"ERROR: Likely tried to listen on a broken websocket.")
+            self.disconnect(websocket)
 
     async def send_personal_message(
         self, player_id: int, message: Dict, attempt_number: int = 0
@@ -135,6 +148,7 @@ class GameController:
             await asyncio.sleep(1)
             await self.send_personal_message(player_id, message, attempt_number + 1)
             return
+
         try:
             await self.player_to_connection[player_id].send_text(json.dumps(message))
         except WebSocketDisconnect:
