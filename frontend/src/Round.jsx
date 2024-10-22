@@ -31,31 +31,37 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
               <Text fontWeight="bold" mb={2}>
                 Hand
               </Text>
-              <Flex direction="row" justifyContent="center">
-                {hand.hand_cards.map((card, i) => (
-                  <Box
-                    key={i}
-                    p={1}
-                    borderWidth={1}
-                    borderColor="black"
-                    borderRadius="md"
-                    mx={1}
-                    transition="transform 0.2s"
-                    _hover={{ transform: "scale(1.1)" }}
-                  >
-                    <Image
-                      src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                      alt={`Card ${card}`}
-                      boxSize="50px"
-                      objectFit="cover"
-                    />
-                  </Box>
-                ))}
-              </Flex>
+              {hand ? ( // Check if hand is not null
+                <Flex direction="row" justifyContent="center">
+                  {hand.hand_cards.map((card, i) => (
+                    <Box
+                      key={i}
+                      p={1}
+                      borderWidth={1}
+                      borderColor="black"
+                      borderRadius="md"
+                      mx={1}
+                      transition="transform 0.2s"
+                      _hover={{ transform: "scale(1.1)" }}
+                    >
+                      <Image
+                        src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
+                        alt={`Card ${card}`}
+                        boxSize="50px"
+                        objectFit="cover"
+                      />
+                    </Box>
+                  ))}
+                </Flex>
+              ) : (
+                <Text fontWeight="bold" color="red.500"> {/* Display "Pass" if hand is null */}
+                  Pass
+                </Text>
+              )}
             </Flex>
             <Box width="20px" /> {/* Spacer */}
             {/* Conditionally render the kicker section if there are kicker cards */}
-            {hand.kicker_cards.length > 0 && (
+            {hand && hand.kicker_cards.length > 0 && ( // Check if hand is not null before rendering kicker cards
               <Flex
                 direction="column"
                 alignItems="center"

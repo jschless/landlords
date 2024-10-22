@@ -265,6 +265,11 @@ class GameController:
                 self.g.register_hand(
                     self.g.players[last_player].username, cur_hand.serialize()
                 )
+            else:
+                # This person passed
+                self.g.register_hand(
+                    self.g.players[(self.g.current_player - 1) % 3].username, None
+                )
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
