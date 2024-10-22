@@ -329,16 +329,6 @@ class GameController:
         possible_moves = Hand.suggest_moves(
             h, self.g.players[self.g.current_player].cards
         )
-        if h is not None and len(possible_moves) == 0:
-            # Should skip, because player can't possibly go...
-            logger.info(
-                f"Skipping {self.g.players[self.g.current_player].username} because there is no possible move."
-            )
-            await self.alert_all(
-                f"Skipping {self.g.players[self.g.current_player].username} because there is no possible move."
-            )
-            return None, self.g.current_player
-
         msg = {
             "action": "make_a_move",
             "last_hand": serializable_hand,
