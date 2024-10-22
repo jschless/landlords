@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import BetComponent from "./BetComponent";
 import Hand from "./Hand";
@@ -11,10 +11,11 @@ import RoundInfo from "./RoundInfo";
 import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
 import CardMoveButtons from "./CardMoveButtons";
+import CountdownTimer from "./CountdownTimer";
 import { Heading, Container, Flex } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
 const testMode = false;
-
+const TIMER_LENGTH = 15;
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -38,6 +39,8 @@ function GameLobby() {
   const [alertMessages, setAlertMessages] = useState([]);
   const [uniqueId, setUniqueId] = useState("");
   const [possibleMoves, setPossibleMoves] = useState(null);
+  const [moveTimer, setMoveTimer] = useState(TIMER_LENGTH);
+  const timerRef = useRef(null); // Use ref to hold timer ID
 
   const sendMove = (cards, kickers) => {
     if (socket && promptMove) {
@@ -49,6 +52,7 @@ function GameLobby() {
       console.log("Sending selected cards:", message);
       socket.send(JSON.stringify(message));
       setPromptMove(false);
+      clearInterval(timerRef.current);
     }
   };
 
@@ -75,10 +79,11 @@ function GameLobby() {
       setLoading(false);
       setPromptMove(false);
       setPromptBet(false);
-      setAlertMessages([
-        { id: 1, message: "test 1" },
-        { id: 2, message: "test 2" },
-      ]);
+      // setAlertMessages([
+      //   { id: 1, message: "test 1" },
+      //   { id: 2, message: "test 2" },
+      // ]);
+      setPromptMove(true);
       console.log("Alert Messages", alertMessages);
     } else {
       fetchGameData();
@@ -121,7 +126,15 @@ function GameLobby() {
         console.log("REQUEST FOR MOVE", message);
         setPossibleMoves(message.possible_moves);
         setPromptMove(true);
+        // Set timer
         console.log("Initiating timer");
+        setMoveTimer(TIMER_LENGTH);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+          setMoveTimer((prev) => {
+            return prev - 1;
+          });
+        }, 1000);
       } else if (message.action === "make_a_bid") {
         // Prompt for a bet
         setLastBid(message.last_bid);
@@ -137,8 +150,26 @@ function GameLobby() {
 
     return () => {
       ws.close();
+      clearInterval(timerRef.current);
     };
-  }, [id, alertMessages]);
+  }, [setUniqueId]);
+
+  // Timer countdown0
+  useEffect(() => {
+    if (promptMove && moveTimer <= 1) {
+      console.log("Auto submitting move");
+      clearInterval(timerRef.current);
+      const message = {
+        action: "move",
+        cards: [],
+        kickers: [],
+      };
+      console.log("Sending selected cards:", message);
+      socket.send(JSON.stringify(message));
+      setPromptMove(false);
+      clearInterval(timerRef.current);
+    }
+  }, [promptMove, moveTimer, timerRef, socket]);
 
   const submitMove = (selectedCards, selectedKickers) => {
     if (socket && promptMove) {
@@ -229,6 +260,8 @@ function GameLobby() {
             handleMove={handleMove}
           />
         )}
+
+        <CountdownTimer promptMove={promptMove} moveTimer={moveTimer} />
 
         {/* Bet Component */}
         {promptBet && <BetComponent lastBid={lastBid} submitBet={submitBet} />}
