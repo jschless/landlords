@@ -1,10 +1,9 @@
 from .player import Player
 from .hand import Hand
 
-from typing import List, Tuple, Optional, Dict
-from pydantic import BaseModel, Field, root_validator
+from typing import List, Optional, Dict
+from pydantic import BaseModel
 import random
-import json
 import logging
 
 logger = logging.getLogger(__name__)

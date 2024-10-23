@@ -185,9 +185,9 @@ class Hand(BaseModel):
         elif self.base == 3 and self.chain_length > 0:
             return f"triple-{self.chain_length}-chain"
         elif self.base == 4:
-            return f"bomb"
+            return "bomb"
         elif self.base == 5:
-            return f"ultimate bomb"
+            return "ultimate bomb"
 
         raise ValueError("Should not be reachable")
 

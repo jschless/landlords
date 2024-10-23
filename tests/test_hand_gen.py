@@ -120,4 +120,4 @@ def test_possible_hands(hand, hand_cards, kicker_cards, expected_moves):
     moves = h.possible_hands(hand)
     assert moves == expected_moves
     for a, b in moves:
-        assert h.is_valid_successor(Hand.parse_hand(a, b)) == True
+        assert h.is_valid_successor(Hand.parse_hand(a, b))

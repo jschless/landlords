@@ -36,7 +36,7 @@ class GameController:
     async def connect(self, websocket: WebSocket, uid: str) -> None:
         logger.info(f"Current connections: {self.active_connections}")
         if len(self.active_connections) > 3:
-            logger.info(f"No more people can join")
+            logger.info("No more people can join")
         elif uid in self.uid_to_player:
             # don't add a new user, this is a reconnect
             # first check if the existing connection is in active connections and remove
@@ -71,7 +71,7 @@ class GameController:
 
     def disconnect(self, websocket: WebSocket) -> None:
         if websocket in self.active_connections:
-            logger.info(f"Disconnecting websocket")
+            logger.info("Disconnecting websocket")
             self.active_connections.remove(websocket)
 
     def add_player(self, websocket: WebSocket, username: str | None, uid: str) -> None:
@@ -129,7 +129,7 @@ class GameController:
             logger.info(f"Disconnect while listening for messages for {player_id}")
             self.disconnect(websocket)
         except RuntimeError:
-            logger.error(f"ERROR: Likely tried to listen on a broken websocket.")
+            logger.error("ERROR: Likely tried to listen on a broken websocket.")
             self.disconnect(websocket)
 
     async def send_personal_message(
@@ -168,7 +168,6 @@ class GameController:
 
     async def alert_all(self, message) -> None:
         for player_id, _ in self.player_to_connection.items():
-            uid = self.player_to_uid(player_id)
             msg = {"action": "alert", "message": message}
             await self.send_personal_message(player_id, msg)
 
@@ -203,13 +202,13 @@ class GameController:
             await self.send_personal_message(self.g.landlord, msg)
             response = await self.wait_for_message(self.g.landlord, msg)
             logger.info(f"Renew game response was {response}")
-            if response["decision"] == True:
+            if response["decision"]:
                 await self.play_again()
         else:
             await self.play_again()
 
     async def play_again(self) -> None:
-        logger.info(f"Resetting game and starting over.")
+        logger.info("Resetting game and starting over.")
         self.g.reset_game()
         await self.start_game()
 
@@ -255,9 +254,6 @@ class GameController:
                     # break for loop if this is valid
                     break
                 except ValueError:
-                    serializable_hand = (
-                        None if cur_hand is None else cur_hand.model_dump(mode="json")
-                    )
                     await self.send_personal_message(
                         self.g.current_player,
                         {

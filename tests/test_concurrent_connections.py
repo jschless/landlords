@@ -1,6 +1,5 @@
 import pytest
-from .utils import format_move, execute_moves_multiple
-from .conftest import complete_game_p1_blowout, complete_game_p3_blowout
+from .utils import execute_moves_multiple
 
 
 @pytest.mark.asyncio

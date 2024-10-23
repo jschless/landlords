@@ -47,7 +47,7 @@ async def execute_moves_multiple(
 
                 except asyncio.TimeoutError:
                     return update
-                except Exception as e:
+                except Exception:
                     return update
         if reconnect_at_message == len(messages_to_send):
             await asyncio.sleep(3)

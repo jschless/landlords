@@ -1,16 +1,12 @@
-import os
 import random
 import string
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 import asyncio
-from typing import Dict, List
 
 from backend.game_controller import GameController
-from model.game import Game
 import logging
 
 logging.basicConfig(
