@@ -2,9 +2,8 @@ import pytest
 from .utils import execute_moves_multiple
 
 
-async def test_disconnect_at_start(
-    fastapi_server, complete_game_p3_blowout, player_to_test, disconnect_round
-):
+@pytest.mark.asyncio
+async def test_disconnect_at_start(fastapi_server, complete_game_p3_blowout):
     ###
     pass
 
