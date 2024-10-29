@@ -6,12 +6,6 @@ services:
     command: uvicorn backend.server:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
-    labels:
-      - "traefik.enable=true"
-      # - "traefik.http.routers.backend.rule=Host(`localhost`)" # && PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"  # Port where your backend is running
-      - "traefik.docker.network=web"
     networks:
       - web
 
@@ -30,8 +24,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`localhost`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"  # Port where your frontend is running
-      - "traefik.docker.network=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     networks:
       - web
 
@@ -41,23 +34,16 @@ services:
     command:
       - "--api.insecure=true"
       - "--entrypoints.web.address=:80"
-      # - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
-      - "--log.level=DEBUG"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworigin=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,OPTIONS,PUT"
       - "traefik.http.routers.backend.middlewares=backend-cors"
-      # - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      # - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      # - "--certificatesresolvers.myresolver.acme.email=joe.c.schlessinger@gmail.com"
-      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
-      # - "443:443"
       - "8080:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"  # To allow Traefik to access Docker events
-      # - "./letsencrypt:/letsencrypt"  # For storing certificates
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - web
 
