@@ -15,7 +15,7 @@ function Home() {
 
   const createGame = async () => {
     try {
-      const response = await fetch("http://localhost:8000/create_game", {
+      const response = await fetch("http://134.122.123.229:8000/create_game", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
