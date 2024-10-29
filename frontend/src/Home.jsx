@@ -15,7 +15,11 @@ function Home() {
 
   const createGame = async () => {
     try {
-      const response = await fetch("http://134.122.123.229:8000/create_game", {
+      const apiUrl = process.env.REACT_APP_DEVELOPMENT
+        ? "localhost:8000"
+        : "134.122.123.229:8000";
+      console.log(apiUrl);
+      const response = await fetch(`http://${apiUrl}/create_game`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

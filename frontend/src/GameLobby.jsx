@@ -42,6 +42,10 @@ function GameLobby() {
   const [moveTimer, setMoveTimer] = useState(TIMER_LENGTH);
   const timerRef = useRef(null); // Use ref to hold timer ID
 
+  const apiUrl = process.env.REACT_APP_DEVELOPMENT
+    ? "localhost:8000"
+    : "134.122.123.229:8000";
+
   const sendMove = (cards, kickers) => {
     if (socket && promptMove) {
       const message = {
@@ -59,7 +63,7 @@ function GameLobby() {
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        const response = await fetch(`http://134.122.123.229:8000/game/${id}`);
+        const response = await fetch(`http://${apiUrl}/game/${id}`);
 
         if (!response.ok) {
           throw new Error("Game not found");
@@ -96,9 +100,7 @@ function GameLobby() {
     }
     setUniqueId(uniqueIdCook); // Save the uniqueId in the state
 
-    const ws = new WebSocket(
-        `ws://134.122.123.229:8000/ws/game/${id}?id=${uniqueIdCook}`,
-    );
+    const ws = new WebSocket(`ws://${apiUrl}/ws/game/${id}?id=${uniqueIdCook}`);
 
     ws.onopen = () => {
       console.log("WebSocket connection established");
