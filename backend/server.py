@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-origins = ["http://localhost:3000"]
+origins = ["http://localhost:3000", "http://161.35.58.72:3000/"]
 
 app.add_middleware(
     CORSMiddleware,

@@ -59,7 +59,7 @@ function GameLobby() {
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/game/${id}`);
+        const response = await fetch(`http://134.122.123.229:8000/game/${id}`);
 
         if (!response.ok) {
           throw new Error("Game not found");
