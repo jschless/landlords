@@ -154,6 +154,7 @@ function GameLobby() {
       ws.close();
       clearInterval(timerRef.current);
     };
+    // eslint-disable-next-line
   }, []);
 
   // Timer countdown0
