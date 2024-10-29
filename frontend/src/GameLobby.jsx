@@ -97,7 +97,7 @@ function GameLobby() {
     setUniqueId(uniqueIdCook); // Save the uniqueId in the state
 
     const ws = new WebSocket(
-      `ws://localhost:8000/ws/game/${id}?id=${uniqueIdCook}`,
+        `ws://134.122.123.229:8000/ws/game/${id}?id=${uniqueIdCook}`,
     );
 
     ws.onopen = () => {
