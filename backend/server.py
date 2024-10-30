@@ -58,10 +58,12 @@ async def get_home():
 
 @app.post("/backend/create_game")
 async def create_game():
+    logger.info("Received create game request")
     game_id = gen_game_id()
     game_manager = GameController(game_id)
     game_manager.initialize_game(players=[], game_id=game_id, game_count=len(games))
     games[game_id] = game_manager
+    logger.info(f"Trying to return {game_id}")
     return {"game_id": game_id}
 
 
