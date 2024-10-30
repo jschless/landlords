@@ -19,12 +19,7 @@ function CountdownTimer({ promptMove, moveTimer }) {
           <Text fontSize="xl" fontWeight="bold">
             Time left:
           </Text>
-          <Badge
-            ml={3}
-            fontSize="2xl"
-            colorScheme="yellow"
-            variant="solid"
-          >
+          <Badge ml={3} fontSize="2xl" colorScheme="yellow" variant="solid">
             {moveTimer}
           </Badge>
         </Box>

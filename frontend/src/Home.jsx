@@ -42,7 +42,7 @@ function Home() {
     <Container maxW="container.lg" p={4} centerContent>
       <Stack spacing={6} align="center" textAlign="center">
         <Heading as="h1" size="2xl" mb={4}>
-          Welcome to the Game!
+          Welcome to the Dough Dizhu!
         </Heading>
         <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
           This is an interactive card game platform where you can create and
@@ -59,7 +59,6 @@ function Home() {
           Create Game
         </Button>
       </Stack>
-      {/* Optional styling for better aesthetics */}
       <Box
         position="absolute"
         bottom="20px"
