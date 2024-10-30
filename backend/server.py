@@ -51,12 +51,12 @@ def gen_game_id(length=5):
     )
 
 
-@app.get("/")
+@app.get("/backend/")
 async def get_home():
     return HTMLResponse("<h1>Welcome to the game</h1>")
 
 
-@app.post("/create_game")
+@app.post("/backend/create_game")
 async def create_game():
     game_id = gen_game_id()
     game_manager = GameController(game_id)
@@ -65,7 +65,7 @@ async def create_game():
     return {"game_id": game_id}
 
 
-@app.get("/game/{game_id}")
+@app.get("/backend/game/{game_id}")
 async def game_lobby(game_id: str):
     if game_id not in games:
         raise HTTPException(status_code=404, detail="Game not found")
@@ -73,7 +73,7 @@ async def game_lobby(game_id: str):
     return games[game_id].g.game_data(None)
 
 
-@app.websocket("/ws/game/{game_id}")
+@app.websocket("/backend/ws/game/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
     user_id = websocket.query_params.get("id")
     if not user_id:

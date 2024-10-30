@@ -43,8 +43,12 @@ function GameLobby() {
   const timerRef = useRef(null); // Use ref to hold timer ID
 
   const apiUrl = process.env.REACT_APP_DEVELOPMENT
-    ? "localhost:8000"
-    : "134.122.123.229:8000";
+    ? "http://localhost:8000"
+    : "https://doughdizhu.com/backend";
+
+  const wsUrl = process.env.REACT_APP_DEVELOPMENT
+    ? "ws://localhost:8000"
+    : "ws://doughdizhu.com/backend";
 
   const sendMove = (cards, kickers) => {
     if (socket && promptMove) {
@@ -63,7 +67,7 @@ function GameLobby() {
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        const response = await fetch(`http://${apiUrl}/game/${id}`);
+        const response = await fetch(`${apiUrl}/game/${id}`);
 
         if (!response.ok) {
           throw new Error("Game not found");
@@ -100,7 +104,7 @@ function GameLobby() {
     }
     setUniqueId(uniqueIdCook); // Save the uniqueId in the state
 
-    const ws = new WebSocket(`ws://${apiUrl}/ws/game/${id}?id=${uniqueIdCook}`);
+    const ws = new WebSocket(`${wsUrl}/ws/game/${id}?id=${uniqueIdCook}`);
 
     ws.onopen = () => {
       console.log("WebSocket connection established");
