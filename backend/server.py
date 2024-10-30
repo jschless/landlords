@@ -29,7 +29,10 @@ origins = [
     "http://localhost",
     "http://doughdizhu.com",
     "http://doughdizhu.com:3000",
+    "https://doughdizhu.com",
+    "https://doughdizhu.com:3000",
 ]
+
 
 app.add_middleware(
     CORSMiddleware,

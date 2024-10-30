@@ -8,6 +8,11 @@ services:
       - "8000:8000"
     networks:
       - web
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.backend.rule=Host(`doughdizhu.com`)"
+    #   - "traefik.http.routers.backend.entrypoints=websecure"
+    #   - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
   frontend:
     build:

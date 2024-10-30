@@ -17,7 +17,7 @@ function Home() {
     try {
       const apiUrl = process.env.REACT_APP_DEVELOPMENT
         ? "http://localhost:8000"
-        : "https://doughdizhu.com:8000";
+        : "http://doughdizhu.com:8000";
       console.log(apiUrl);
       const response = await fetch(`${apiUrl}/create_game`, {
         method: "POST",
