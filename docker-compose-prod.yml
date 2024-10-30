@@ -52,6 +52,7 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=joe.c.schlessinger@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
       - "--api.insecure=true"
+      - "--api.dashboard=true"
       - "--log.level=DEBUG"
       # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
