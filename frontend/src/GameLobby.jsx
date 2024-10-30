@@ -48,7 +48,7 @@ function GameLobby() {
 
   const wsUrl = process.env.REACT_APP_DEVELOPMENT
     ? "ws://localhost:8000/backend"
-    : "ws://doughdizhu.com/backend";
+    : "wss://doughdizhu.com/backend";
 
   const sendMove = (cards, kickers) => {
     if (socket && promptMove) {
