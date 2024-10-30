@@ -10,7 +10,7 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/backend`)"
+      - "traefik.http.routers.frontend.rule=Host(`doughdizhu.com`) && PathPrefix(`/frontend`)"
       - "traefik.http.routers.backend.entrypoints=web, websecure"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
@@ -27,7 +27,7 @@ services:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`doughdizhu.com`)"
+      - "traefik.http.routers.frontend.rule=Host(`doughdizhu.com`) && PathPrefix(`/`)"
       - "traefik.http.routers.frontend.entrypoints=web, websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
