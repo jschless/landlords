@@ -18,7 +18,7 @@ async def execute_moves_multiple(
     ):
         await asyncio.sleep(delay)
         async with websockets.connect(
-            f"ws://localhost:8000/ws/game/{game_id}?id={user_id}"
+            f"ws://localhost:8000/backend/ws/game/{game_id}?id={user_id}"
         ) as websocket:
             update = None
             while True:
@@ -56,7 +56,7 @@ async def execute_moves_multiple(
     game_ids = []
     for i, _ in enumerate(moves):
         async with httpx.AsyncClient() as client:
-            response = await client.post("http://localhost:8000/create_game")
+            response = await client.post("http://localhost:8000/backend/create_game")
             assert response.status_code == 200
             game_ids.append((i, response.json()["game_id"]))
 
