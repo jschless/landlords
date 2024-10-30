@@ -43,11 +43,11 @@ function GameLobby() {
   const timerRef = useRef(null); // Use ref to hold timer ID
 
   const apiUrl = process.env.REACT_APP_DEVELOPMENT
-    ? "http://localhost:8000"
+    ? "http://localhost:8000/backend"
     : "https://doughdizhu.com/backend";
 
   const wsUrl = process.env.REACT_APP_DEVELOPMENT
-    ? "ws://localhost:8000"
+    ? "ws://localhost:8000/backend"
     : "ws://doughdizhu.com/backend";
 
   const sendMove = (cards, kickers) => {

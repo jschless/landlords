@@ -32,7 +32,7 @@ function Home() {
 
       const data = await response.json();
       const gameId = data.game_id;
-      navigate(`/backend/game/${gameId}`);
+      navigate(`/game/${gameId}`);
     } catch (error) {
       console.error("Error creating game:", error);
     }
