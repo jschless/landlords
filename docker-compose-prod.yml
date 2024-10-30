@@ -1,9 +1,9 @@
 services:
   backend:
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.uv
     container_name: backend
-    command: uvicorn backend.server:app --host 0.0.0.0 --port 8000
+    command: uv run uvicorn backend.server:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
     networks:
@@ -11,7 +11,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`doughdizhu.com`) && PathPrefix(`/backend`)"
-      - "traefik.http.routers.backend.entrypoints=web, websecure"
+      - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
 
@@ -29,7 +29,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`doughdizhu.com`)"
-      - "traefik.http.routers.frontend.entrypoints=web, websecure"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     networks:
@@ -52,11 +52,8 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=joe.c.schlessinger@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
-      - "--api.insecure=true"
-      - "--api.dashboard=true"
-      - "--log.level=DEBUG"
-      # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
     ports:
       - "443:443"
       - "80:80"
