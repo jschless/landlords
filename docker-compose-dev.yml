@@ -39,7 +39,6 @@ services:
     command:
       - "--api.insecure=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
       - "--providers.docker=true"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworigin=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,OPTIONS,PUT"
