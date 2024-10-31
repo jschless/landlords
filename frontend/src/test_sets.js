@@ -273,5 +273,5 @@ export const ogTestData = {
       },
     ],
   ],
-  bid: 3,
+    bid: 3,
 };
