@@ -2,9 +2,9 @@ name: Lint and pytest
 
 on:
   # Trigger the workflow on push or pull request events
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   pull_request:
     branches:
       - main
