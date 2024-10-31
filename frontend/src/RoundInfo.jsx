@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Heading, Text, Stack, useColorModeValue } from "@chakra-ui/react";
+import { motion, useAnimation } from "framer-motion";
+
+const MotionText = motion(Text);
 
 function RoundInfo({ gameData }) {
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({
+      scale: [1, 1.5, 1],
+      transition: { duration: 2 },
+    });
+  }, [gameData.bid, controls]);
+
   return (
     <Box
       p={4}
@@ -19,9 +31,13 @@ function RoundInfo({ gameData }) {
         <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
           Current landlord: {gameData.landlord_username}
         </Text>
-        <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
+        <MotionText
+          fontSize="md"
+          color={useColorModeValue("gray.600", "gray.300")}
+          animate={controls}
+        >
           Bet Stakes: {gameData.bid}
-        </Text>
+        </MotionText>
         <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
           Hand Type:{" "}
           {gameData.cur_round.length > 0
