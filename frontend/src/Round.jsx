@@ -11,9 +11,9 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
       shadow="md"
       flex="3"
     >
-      <Heading>Playing Area</Heading>
+      <Flex direction="column" alignItems="center" gap="4">
+        <Heading>Playing Area</Heading>
 
-      <Flex direction="column" alignItems="center">
         {hands.map(([player, hand], index) => (
           <Flex key={index} alignItems="center" mb={4}>
             <Text p={0} m={2}>
