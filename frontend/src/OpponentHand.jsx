@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 
-function OpponentHand({ username, exposedCards, nCards }) {
+function OpponentHand({ username, exposedCards, nCards, landlord_username }) {
+    const label = landlord_username === username ? "Landlord" : "Peasant";
+    const bg_color = landlord_username === username ? "yellow.300" : "purple.300";
+
   return (
     <Box
       textAlign="center"
@@ -9,7 +12,7 @@ function OpponentHand({ username, exposedCards, nCards }) {
       borderWidth={1}
       borderColor="gray.300"
       borderRadius="md"
-      bg="white"
+      bg={bg_color}
       shadow="md"
       maxWidth="200px"
       p={3} // Padding for some space inside the box
@@ -17,13 +20,17 @@ function OpponentHand({ username, exposedCards, nCards }) {
       _hover={{ shadow: "lg", bg: "gray.50" }} // Hover effect
       flex="1"
     >
-      <Text as="h3" fontSize="lg" fontWeight="bold" mb={8}>
-        {username}
-      </Text>
       <Flex
         direction="column" // Change direction to column
         alignItems="center" // Center-align the items
       >
+        <Text as="h3" fontSize="lg" fontWeight="bold" mb={2}>
+          {username}
+        </Text>
+        <Text as="h3" fontSize="md" fontWeight="bold" mb={8}>
+          {label}
+        </Text>
+
         {exposedCards.map((card, index) => (
           <Image
             key={index}
