@@ -12,10 +12,11 @@ import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
 import CardMoveButtons from "./CardMoveButtons";
 import CountdownTimer from "./CountdownTimer";
-import { Heading, Container, Flex } from "@chakra-ui/react";
+import { Heading, Container, Flex, Stack } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
-const testMode = false;
+const testMode = process.env.REACT_APP_DEVELOPMENT;
 const TIMER_LENGTH = 15;
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -214,7 +215,10 @@ function GameLobby() {
         <Flex justify="space-between" p={4} bg="gray.100">
           <Scoreboard scoreboard={gameData.scoreboard} />
 
-          <Heading size="lg">Game Lobby: {gameData.game_id}</Heading>
+          <Stack spacing={2} align="center">
+            <Heading size="lg">Dough Dizhu Lobby</Heading>
+            <Heading size="sm">Game ID: {gameData.game_id}</Heading>
+          </Stack>
 
           <RoundHistory roundHistory={gameData.round_history} />
         </Flex>
