@@ -12,7 +12,7 @@ import {
 const CardMoveButtons = ({ possibleMoves, handleMove }) => {
   return (
     <>
-      <Heading align="center">Pick a card</Heading>
+      <Heading align="center">Recommended Moves</Heading>
       <Flex width="100%" justify="center" wrap="wrap">
         {" "}
         {/* Centered */}

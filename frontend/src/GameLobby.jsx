@@ -92,6 +92,39 @@ function GameLobby() {
       //   { id: 1, message: "test 1" },
       //   { id: 2, message: "test 2" },
       // ]);
+      setPossibleMoves([
+        {
+          base: 3,
+          chain_length: 1,
+          low: 7,
+          kicker_base: 1,
+          kicker_len: 1,
+          hand_cards: [7, 7, 7],
+          kicker_cards: [3],
+          string_repr: "triple-1-chain with 1 single discards",
+        },
+        {
+          base: 3,
+          chain_length: 1,
+          low: 7,
+          kicker_base: 1,
+          kicker_len: 1,
+          hand_cards: [7, 7, 7],
+          kicker_cards: [3],
+          string_repr: "triple-1-chain with 1 single discards",
+        },
+        {
+          base: 3,
+          chain_length: 1,
+          low: 7,
+          kicker_base: 1,
+          kicker_len: 1,
+          hand_cards: [7, 7, 7],
+          kicker_cards: [3],
+          string_repr: "triple-1-chain with 1 single discards",
+        },
+      ]);
+
       setPromptMove(true);
       console.log("Alert Messages", alertMessages);
     } else {
@@ -238,6 +271,7 @@ function GameLobby() {
                 username={gameData.players[0].username}
                 exposedCards={gameData.players[0].exposed_cards}
                 nCards={gameData.players[0].n_cards}
+                landlord_username={gameData.landlord_username}
               />
             )}
 
@@ -254,28 +288,34 @@ function GameLobby() {
                 username={gameData.players[1].username}
                 exposedCards={gameData.players[1].exposed_cards}
                 nCards={gameData.players[1].n_cards}
+                landlord_username={gameData.landlord_username}
               />
             )}
         </Flex>
 
-        {/* Hand Component */}
-        <Hand
-          myCards={gameData.my_cards}
-          promptMove={promptMove}
-          onSubmit={submitMove}
-        />
-
-        {possibleMoves && possibleMoves.length > 0 && promptMove && (
-          <CardMoveButtons
-            possibleMoves={possibleMoves}
-            handleMove={handleMove}
+        <Flex direction="column" justify="space-between" gap="4">
+          {/* Hand Component */}
+          <Hand
+            myCards={gameData.my_cards}
+            promptMove={promptMove}
+            onSubmit={submitMove}
+            isLandlord={gameData.username === gameData.landlord_username}
           />
-        )}
 
-        <CountdownTimer promptMove={promptMove} moveTimer={moveTimer} />
+          {possibleMoves && possibleMoves.length > 0 && promptMove && (
+            <CardMoveButtons
+              possibleMoves={possibleMoves}
+              handleMove={handleMove}
+            />
+          )}
 
-        {/* Bet Component */}
-        {promptBet && <BetComponent lastBid={lastBid} submitBet={submitBet} />}
+          <CountdownTimer promptMove={promptMove} moveTimer={moveTimer} m={4} />
+
+          {/* Bet Component */}
+          {promptBet && (
+            <BetComponent lastBid={lastBid} submitBet={submitBet} />
+          )}
+        </Flex>
       </Container>
     </>
   );
