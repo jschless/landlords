@@ -26,7 +26,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
       <Box
         ref={scrollRef}
         mt={4}
-        maxHeight="700px"  // Set max height for the scrollable area
+        maxHeight="500px"  // Set max height for the scrollable area
         overflowY="auto"
         scrollBehavior="smooth"
         p={2}

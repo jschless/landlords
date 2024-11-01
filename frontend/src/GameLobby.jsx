@@ -251,6 +251,7 @@ function GameLobby() {
           <Stack spacing={2} align="center">
             <Heading size="lg">Dough Dizhu Lobby</Heading>
             <Heading size="sm">Game ID: {gameData.game_id}</Heading>
+            <RoundInfo gameData={gameData} />
           </Stack>
 
           <RoundHistory roundHistory={gameData.round_history} />
@@ -259,7 +260,6 @@ function GameLobby() {
         {alertMessages.length > 0 && <AlertMessage messages={alertMessages} />}
 
         <TurnBanner gameDataUid={gameData.current_player_uid} uid={uniqueId} />
-        <RoundInfo gameData={gameData} />
 
         {/* Opponent Hands and Round Display */}
         <Flex justify="space-between" p={4} gap={4}>
