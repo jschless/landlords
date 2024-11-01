@@ -28,9 +28,11 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
               p={2}
               mr={4}
             >
+              {hand && hand.kicker_cards.length > 0 && (
               <Text fontWeight="bold" mb={2}>
                 Hand
               </Text>
+              )}
               {hand ? ( // Check if hand is not null
                 <Flex direction="row" justifyContent="center">
                   {hand.hand_cards.map((card, i) => (
