@@ -65,7 +65,6 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_LABEL_ENABLE=true
     command: --interval 300
     networks:
       - web
