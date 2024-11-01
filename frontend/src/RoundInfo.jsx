@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box, Heading, Text, Stack, useColorModeValue } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 
-const MotionText = motion(Text);
+const MotionText = motion.create(Text);
 
 function RoundInfo({ gameData }) {
   const controls = useAnimation();
