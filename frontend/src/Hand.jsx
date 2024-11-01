@@ -59,7 +59,7 @@ function Hand({ myCards, onSubmit, promptMove, isLandlord }) {
         <Flex
           direction="row"
           justify="center"
-          overflowX="auto"
+          wrap="wrap"
           flex="1"
           mb={4}
         >
