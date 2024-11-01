@@ -29,7 +29,11 @@ function SpecialHandAnimation({ type }) {
           animate={{ scale: [1, 3, 0], opacity: [1, 0.5, 0] }}
           transition={{ duration: 3 }}
         >
-          <Image src={`${process.env.PUBLIC_URL}/effects/bomb.webp`} alt="Bomb" boxSize="300px" />
+          <Image
+            src={`${process.env.PUBLIC_URL}/effects/bomb.webp`}
+            alt="Bomb"
+            boxSize="300px"
+          />
         </MotionBox>
       )}
 
@@ -39,7 +43,11 @@ function SpecialHandAnimation({ type }) {
           animate={{ x: "100vw" }}
           transition={{ duration: 5 }}
         >
-          <Image src={`${process.env.PUBLIC_URL}/effects/airplane.webp`} alt="Flying Airplane" boxSize="300px" />
+          <Image
+            src={`${process.env.PUBLIC_URL}/effects/airplane.webp`}
+            alt="Flying Airplane"
+            boxSize="300px"
+          />
         </MotionBox>
       )}
     </MotionBox>

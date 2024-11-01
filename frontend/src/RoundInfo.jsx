@@ -1,5 +1,13 @@
 import React, { useEffect } from "react";
-import { Box, Heading, Text, Stack, Flex, useColorModeValue, Image } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Text,
+  Stack,
+  Flex,
+  useColorModeValue,
+  Image,
+} from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 
 const MotionText = motion(Text);
@@ -38,7 +46,12 @@ function RoundInfo({ gameData }) {
         </MotionText>
 
         <Box>
-          <Heading as="h3" size="md" mb={2} color={useColorModeValue("gray.600", "gray.300")}>
+          <Heading
+            as="h3"
+            size="md"
+            mb={2}
+            color={useColorModeValue("gray.600", "gray.300")}
+          >
             Hand to Beat:
           </Heading>
           <Flex justify="center" gap={2}>

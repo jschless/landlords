@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { Box, Image, Button, Flex, Text } from "@chakra-ui/react";
 
-function Hand({ myCards, onSubmit, promptMove, isLandlord, username, current_player_username }) {
+function Hand({
+  myCards,
+  onSubmit,
+  promptMove,
+  isLandlord,
+  username,
+  current_player_username,
+}) {
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedKickers, setSelectedKickers] = useState([]);
   const label = isLandlord ? "Landlord" : "Peasant";
@@ -49,26 +56,16 @@ function Hand({ myCards, onSubmit, promptMove, isLandlord, username, current_pla
       shadow="md"
       p={4}
     >
-        <Text as="h3" fontSize="lg" fontWeight="bold" mb={2}>
-          {username}
-        </Text>
-        <Text as="h3" fontSize="md" fontWeight="bold" mb={8}>
-          {label}
-        </Text>
+      <Text as="h3" fontSize="lg" fontWeight="bold" mb={2}>
+        {username}
+      </Text>
+      <Text as="h3" fontSize="md" fontWeight="bold" mb={8}>
+        {label}
+      </Text>
 
-      <Flex
-        direction="column"
-        justify="space-between"
-        height="100%"
-      >
+      <Flex direction="column" justify="space-between" height="100%">
         {/* Card container with horizontal scrolling */}
-        <Flex
-          direction="row"
-          justify="center"
-          wrap="wrap"
-          flex="1"
-          mb={4}
-        >
+        <Flex direction="row" justify="center" wrap="wrap" flex="1" mb={4}>
           {myCards.map((card, index) => (
             <Image
               key={index}
@@ -91,11 +88,7 @@ function Hand({ myCards, onSubmit, promptMove, isLandlord, username, current_pla
 
         {/* Submit button positioned at the bottom */}
         {promptMove && (
-          <Button
-            onClick={handleSubmit}
-            colorScheme="teal"
-            alignSelf="center"
-          >
+          <Button onClick={handleSubmit} colorScheme="teal" alignSelf="center">
             Submit Selected Cards
           </Button>
         )}
