@@ -12,6 +12,7 @@ import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
 import CardMoveButtons from "./CardMoveButtons";
 import CountdownTimer from "./CountdownTimer";
+import SpecialHandAnimation from "./SpecialHandAnimation";
 import { Heading, Container, Flex, Stack } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
 const testMode = process.env.REACT_APP_DEVELOPMENT;
@@ -41,6 +42,9 @@ function GameLobby() {
   const [uniqueId, setUniqueId] = useState("");
   const [possibleMoves, setPossibleMoves] = useState(null);
   const [moveTimer, setMoveTimer] = useState(TIMER_LENGTH);
+  const [specialHand, setSpecialHand] = useState(null);
+  const [lastHand, setLastHand] = useState(null);
+
   const timerRef = useRef(null); // Use ref to hold timer ID
 
   const apiUrl = process.env.REACT_APP_DEVELOPMENT
@@ -83,11 +87,12 @@ function GameLobby() {
       }
     };
 
-    if (testMode) {
+    if (false) {
       setGameData(completeGameTestData);
       setLoading(false);
       setPromptMove(false);
       setPromptBet(false);
+      // setSpecialHand("bomb");
       // setAlertMessages([
       //   { id: 1, message: "test 1" },
       //   { id: 2, message: "test 2" },
@@ -212,6 +217,37 @@ function GameLobby() {
     }
   }, [promptMove, moveTimer, timerRef, socket]);
 
+  useEffect(() => {
+    // Ensure this runs whenever gameData changes
+    if (gameData) {
+      console.log("gameData updated:", gameData);
+      const currentCurRound = gameData.cur_round || [];
+      console.log("gameData.cur_round:", currentCurRound);
+      console.log("gameData.cur_round.length:", currentCurRound.length);
+
+      const lastRoundEntry = currentCurRound[currentCurRound.length - 1];
+      console.log("Last entry in gameData.cur_round:", lastRoundEntry);
+
+      const tempLastHand = lastRoundEntry?.[1];
+      console.log("Second item in the last entry (lastHand):", tempLastHand);
+
+      if (lastHand !== tempLastHand) {
+        console.log("Updating last hand to", tempLastHand);
+        setLastHand(tempLastHand);
+        if (tempLastHand?.string_repr.includes("bomb")) {
+          setSpecialHand("bomb");
+        } else if (
+          tempLastHand?.string_repr.includes("triple") &&
+          tempLastHand?.string_repr.includes("chain")
+        ) {
+          setSpecialHand("airplane");
+        } else {
+          setSpecialHand(null);
+        }
+      }
+    }
+  }, [gameData]); // Runs whenever gameData changes
+
   const submitMove = (selectedCards, selectedKickers) => {
     if (socket && promptMove) {
       sendMove(
@@ -263,6 +299,8 @@ function GameLobby() {
 
         {/* Opponent Hands and Round Display */}
         <Flex justify="space-between" p={4} gap={4}>
+          {specialHand && <SpecialHandAnimation type={specialHand} />}
+
           {/* Left Opponent */}
           {gameData.started &&
             gameData.players &&
