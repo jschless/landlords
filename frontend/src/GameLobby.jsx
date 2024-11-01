@@ -302,6 +302,8 @@ function GameLobby() {
             promptMove={promptMove}
             onSubmit={submitMove}
             isLandlord={gameData.username === gameData.landlord_username}
+            username={gameData.username}
+            current_player_username={gameData.current_player_username}
           />
 
           {possibleMoves && possibleMoves.length > 0 && promptMove && (
