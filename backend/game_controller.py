@@ -296,8 +296,20 @@ class GameController:
             await self.update_all()
 
     def deal_cards(self) -> None:
-        for i in range(3):
-            self.g.players[i].deal_cards(sorted(self.g.deck[17 * i : 17 * (i + 1)]))
+        if os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
+            # Deal a stacked hand
+            self.g.players[0].deal_cards(
+                [3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7]
+            )
+            self.g.players[1].deal_cards(
+                [3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7]
+            )
+            self.g.players[2].deal_cards(
+                [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 4]
+            )
+        else:
+            for i in range(3):
+                self.g.players[i].deal_cards(sorted(self.g.deck[17 * i : 17 * (i + 1)]))
 
     def flip_one_card(self) -> None:
         # randomly chose someone to flip a card. they will bid first

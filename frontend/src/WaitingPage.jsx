@@ -57,9 +57,7 @@ function WaitingPage({ gameData }) {
           boxShadow="lg"
         >
           <List spacing={3} textAlign="left">
-            <ListItem fontWeight="bold">
-              1. {gameData.username} (you)
-            </ListItem>
+            <ListItem fontWeight="bold">1. {gameData.username} (you)</ListItem>
             {gameData.players.map((player, index) => (
               <ListItem key={index} fontWeight="medium">
                 {index + 2}. {player.username}

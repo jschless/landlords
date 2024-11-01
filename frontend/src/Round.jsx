@@ -1,27 +1,42 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Box,
-  Flex,
   Image,
   Text,
   Heading,
-  Button,
   VStack,
   HStack,
   Badge,
-  useClipboard,
 } from "@chakra-ui/react";
-import { CopyIcon } from "@chakra-ui/icons";
 
 const Round = ({ hands, bidValue, currentPlayer }) => {
-  const currentUrl = window.location.href;
-  const { hasCopied, onCopy } = useClipboard(currentUrl);
+  const scrollRef = useRef();
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [hands]);
 
   return (
-    <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md" flex="3" overflowY="auto" maxHeight="600px">
-      <VStack spacing={6} align="center">
-        <Heading size="lg">Playing Area</Heading>
+    <Box
+      textAlign="center"
+      p={4}
+      gap={20}
+      bg="gray.50"
+      borderRadius="md"
+      shadow="md"
+      flex="3"
+    >
+      <Heading size="lg">Playing Area</Heading>
 
+      <VStack
+        spacing={2}
+        align="center"
+        maxHeight="500px"
+        overflowY="auto"
+        scrollBehavior="smooth"
+      >
         {hands.map(([player, hand], index) => (
           <Box
             key={index}
@@ -52,7 +67,14 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
               </VStack>
 
               {/* Hand Display */}
-              <VStack spacing={1} align="center" borderWidth={1} borderColor="gray.300" borderRadius="md" p={3}>
+              <VStack
+                spacing={1}
+                align="center"
+                borderWidth={1}
+                borderColor="gray.300"
+                borderRadius="md"
+                p={3}
+              >
                 <Text fontWeight="bold" fontSize="md" color="gray.500">
                   Hand
                 </Text>
@@ -87,7 +109,14 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
 
               {/* Kicker Display */}
               {hand && hand.kicker_cards.length > 0 && (
-                <VStack spacing={1} align="center" borderWidth={1} borderColor="gray.300" borderRadius="md" p={3}>
+                <VStack
+                  spacing={1}
+                  align="center"
+                  borderWidth={1}
+                  borderColor="gray.300"
+                  borderRadius="md"
+                  p={3}
+                >
                   <Text fontWeight="bold" fontSize="md" color="gray.500">
                     Kicker
                   </Text>

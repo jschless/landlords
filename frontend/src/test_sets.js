@@ -62,7 +62,7 @@ export const test1 = {
 export const completeGameTestData = {
   game_id: "CK0BS",
   username: "Dominic Miller",
-  my_cards: [3, 3, 4, 5, 6, 7, 8, 9, 10],
+  my_cards: [3, 3, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17],
   players: [
     {
       username: "Carla Munoz",
@@ -77,10 +77,10 @@ export const completeGameTestData = {
   ],
   landlord: 0,
   landlord_username: "Dominic Miller",
-  started: true,
+  started: false,
   action: "update",
   current_player: 1,
-  current_player_username: "Carla Munoz",
+  current_player_username: "Dominic Miller",
   scoreboard: {
     "Dominic Miller": 6,
     "Carla Munoz": -3,
@@ -96,7 +96,7 @@ export const completeGameTestData = {
         kicker_base: 0,
         kicker_len: 0,
         hand_cards: [6, 6],
-          kicker_cards: [3,3],
+        kicker_cards: [3, 3],
         string_repr: "pair-1-chain with no discard",
       },
     ],
@@ -178,7 +178,19 @@ export const completeGameTestData = {
         string_repr: "pair-1-chain with no discard",
       },
     ],
-
+    [
+      "Carla Munoz",
+      {
+        base: 2,
+        chain_length: 1,
+        low: 7,
+        kicker_base: 0,
+        kicker_len: 0,
+        hand_cards: [7, 7],
+        kicker_cards: [],
+        string_repr: "pair-1-chain with no discard",
+      },
+    ],
   ],
   round_history: [
     [
@@ -339,5 +351,5 @@ export const ogTestData = {
       },
     ],
   ],
-    bid: 3,
+  bid: 3,
 };

@@ -1,49 +1,81 @@
 import React, { useEffect } from "react";
-import { Box, Heading, Text, Stack, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Text,
+  Stack,
+  Flex,
+  useColorModeValue,
+  Image,
+} from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 
 const MotionText = motion.create(Text);
 
 function RoundInfo({ gameData }) {
   const controls = useAnimation();
+  const lastHand = gameData.cur_round[gameData.cur_round.length - 1]?.[1];
 
   useEffect(() => {
     controls.start({
-      scale: [1, 1.5, 1],
-      transition: { duration: 2 },
+      scale: [1, 1.3, 1],
+      transition: { duration: 1.5 },
     });
   }, [gameData.bid, controls]);
 
   return (
     <Box
-      p={4}
+      p={6}
       borderWidth={1}
-      borderRadius="md"
-      m={2}
-      borderColor={useColorModeValue("gray.200", "gray.700")}
-      bg={useColorModeValue("white", "gray.800")}
-      boxShadow="md"
+      borderRadius="lg"
+      borderColor={useColorModeValue("gray.300", "gray.600")}
+      bg={useColorModeValue("white", "gray.700")}
+      boxShadow="lg"
+      maxWidth="600px"
+      textAlign="center"
+      m="auto"
     >
-      <Stack spacing={2} textAlign="center">
-        <Heading as="h2" size="lg">
-          Current turn: {gameData.current_player_username}
-        </Heading>
-        <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
-          Current landlord: {gameData.landlord_username}
-        </Text>
+      <Stack spacing={4}>
         <MotionText
-          fontSize="md"
-          color={useColorModeValue("gray.600", "gray.300")}
+          fontSize="2xl"
+          fontWeight="bold"
+          color={useColorModeValue("blue.500", "blue.300")}
           animate={controls}
         >
-          Bet Stakes: {gameData.bid}
+          Current Bet: {gameData.bid}
         </MotionText>
-        <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")}>
-          Hand Type:{" "}
-          {gameData.cur_round.length > 0
-            ? gameData.cur_round[0][1].string_repr
-            : "None"}
-        </Text>
+
+        <Box>
+          <Heading
+            as="h3"
+            size="md"
+            mb={2}
+            color={useColorModeValue("gray.600", "gray.300")}
+          >
+            Hand to Beat:
+          </Heading>
+          <Flex justify="center" gap={2}>
+            {lastHand?.hand_cards?.map((card, i) => (
+              <Box
+                key={i}
+                p={1}
+                borderWidth={1}
+                borderColor="black"
+                borderRadius="md"
+                mx={1}
+                transition="transform 0.2s"
+                _hover={{ transform: "scale(1.1)" }}
+              >
+                <Image
+                  src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
+                  alt={`Card ${card}`}
+                  boxSize="50px"
+                  objectFit="cover"
+                />
+              </Box>
+            ))}
+          </Flex>
+        </Box>
       </Stack>
     </Box>
   );
