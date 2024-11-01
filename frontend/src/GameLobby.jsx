@@ -272,6 +272,7 @@ function GameLobby() {
                 exposedCards={gameData.players[0].exposed_cards}
                 nCards={gameData.players[0].n_cards}
                 landlord_username={gameData.landlord_username}
+                current_player_username={gameData.current_player_username}
               />
             )}
 
@@ -289,6 +290,7 @@ function GameLobby() {
                 exposedCards={gameData.players[1].exposed_cards}
                 nCards={gameData.players[1].n_cards}
                 landlord_username={gameData.landlord_username}
+                current_player_username={gameData.current_player_username}
               />
             )}
         </Flex>

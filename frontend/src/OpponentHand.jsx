@@ -1,16 +1,25 @@
 import React from "react";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 
-function OpponentHand({ username, exposedCards, nCards, landlord_username }) {
-    const label = landlord_username === username ? "Landlord" : "Peasant";
-    const bg_color = landlord_username === username ? "yellow.300" : "purple.300";
+function OpponentHand({
+  username,
+  exposedCards,
+  nCards,
+  landlord_username,
+  current_player_username,
+}) {
+  const label = landlord_username === username ? "Landlord" : "Peasant";
+  const bg_color = landlord_username === username ? "yellow.300" : "purple.300";
 
+  const border_color =
+    current_player_username === username ? "green.300" : "gray.300";
+  const border_width = current_player_username === username ? 8 : 1;
   return (
     <Box
       textAlign="center"
       my={3}
-      borderWidth={1}
-      borderColor="gray.300"
+      borderWidth={border_width}
+      borderColor={border_color}
       borderRadius="md"
       bg={bg_color}
       shadow="md"
