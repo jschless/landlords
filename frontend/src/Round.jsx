@@ -1,94 +1,73 @@
 import React from "react";
-import { Box, Flex, Image, Text, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Image,
+  Text,
+  Heading,
+  Button,
+  VStack,
+  HStack,
+  Badge,
+  useClipboard,
+} from "@chakra-ui/react";
+import { CopyIcon } from "@chakra-ui/icons";
 
 const Round = ({ hands, bidValue, currentPlayer }) => {
+  const currentUrl = window.location.href;
+  const { hasCopied, onCopy } = useClipboard(currentUrl);
+
   return (
-    <Box
-      textAlign="center"
-      p={4}
-      bg="gray.50"
-      borderRadius="md"
-      shadow="md"
-      flex="3"
-    >
-      <Flex direction="column" alignItems="center" gap="4">
-        <Heading>Playing Area</Heading>
+    <Box textAlign="center" p={4} bg="gray.50" borderRadius="md" shadow="md" flex="3" overflowY="auto" maxHeight="600px">
+      <VStack spacing={6} align="center">
+        <Heading size="lg">Playing Area</Heading>
 
         {hands.map(([player, hand], index) => (
-          <Flex key={index} alignItems="center" mb={4}>
-            <Text p={0} m={2}>
-              ({index + 1}) {player}
-            </Text>
-            <Flex
-              direction="column"
-              alignItems="center"
-              borderWidth={1}
-              borderColor="gray.300"
-              borderRadius="md"
-              p={2}
-              mr={4}
-            >
-              {hand && hand.kicker_cards.length > 0 && (
-              <Text fontWeight="bold" mb={2}>
-                Hand
-              </Text>
-              )}
-              {hand ? ( // Check if hand is not null
-                <Flex direction="row" justifyContent="center">
-                  {hand.hand_cards.map((card, i) => (
-                    <Box
-                      key={i}
-                      p={1}
-                      borderWidth={1}
-                      borderColor="black"
-                      borderRadius="md"
-                      mx={1}
-                      transition="transform 0.2s"
-                      _hover={{ transform: "scale(1.1)" }}
-                    >
-                      <Image
-                        src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                        alt={`Card ${card}`}
-                        boxSize="50px"
-                        objectFit="cover"
-                      />
-                    </Box>
-                  ))}
-                </Flex>
-              ) : (
-                <Text fontWeight="bold" color="red.500">
-                  {" "}
-                  {/* Display "Pass" if hand is null */}
-                  Pass
-                </Text>
-              )}
-            </Flex>
-            <Box width="20px" /> {/* Spacer */}
-            {/* Conditionally render the kicker section if there are kicker cards */}
-            {hand &&
-              hand.kicker_cards.length > 0 && ( // Check if hand is not null before rendering kicker cards
-                <Flex
-                  direction="column"
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor="gray.300"
-                  borderRadius="md"
-                  p={2}
-                >
-                  <Text fontWeight="bold" mb={2}>
-                    Kicker
+          <Box
+            key={index}
+            p={4}
+            borderWidth={2}
+            borderColor="gray.300"
+            borderRadius="lg"
+            boxShadow="md"
+            bg="white"
+            width="100%"
+          >
+            <HStack spacing={4} align="center">
+              {/* Player Details */}
+              <VStack align="flex-start" spacing={1}>
+                <HStack>
+                  <Badge colorScheme="blue" variant="solid" fontSize="lg">
+                    {index + 1}
+                  </Badge>
+                  <Text fontWeight="semibold" fontSize="lg">
+                    {player} {player === currentPlayer && "(Current Player)"}
                   </Text>
-                  <Flex direction="row" justifyContent="center">
-                    {hand.kicker_cards.map((card, i) => (
+                </HStack>
+                {bidValue && (
+                  <Text fontSize="md" color="gray.600">
+                    Current Bid: {bidValue}
+                  </Text>
+                )}
+              </VStack>
+
+              {/* Hand Display */}
+              <VStack spacing={1} align="center" borderWidth={1} borderColor="gray.300" borderRadius="md" p={3}>
+                <Text fontWeight="bold" fontSize="md" color="gray.500">
+                  Hand
+                </Text>
+                {hand ? (
+                  <HStack spacing={1}>
+                    {hand.hand_cards.map((card, i) => (
                       <Box
                         key={i}
                         p={1}
                         borderWidth={1}
                         borderColor="black"
                         borderRadius="md"
-                        mx={1}
                         transition="transform 0.2s"
                         _hover={{ transform: "scale(1.1)" }}
+                        bg="gray.50"
                       >
                         <Image
                           src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
@@ -98,12 +77,47 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
                         />
                       </Box>
                     ))}
-                  </Flex>
-                </Flex>
+                  </HStack>
+                ) : (
+                  <Text fontWeight="bold" color="red.500">
+                    Pass
+                  </Text>
+                )}
+              </VStack>
+
+              {/* Kicker Display */}
+              {hand && hand.kicker_cards.length > 0 && (
+                <VStack spacing={1} align="center" borderWidth={1} borderColor="gray.300" borderRadius="md" p={3}>
+                  <Text fontWeight="bold" fontSize="md" color="gray.500">
+                    Kicker
+                  </Text>
+                  <HStack spacing={1}>
+                    {hand.kicker_cards.map((card, i) => (
+                      <Box
+                        key={i}
+                        p={1}
+                        borderWidth={1}
+                        borderColor="black"
+                        borderRadius="md"
+                        transition="transform 0.2s"
+                        _hover={{ transform: "scale(1.1)" }}
+                        bg="gray.50"
+                      >
+                        <Image
+                          src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
+                          alt={`Card ${card}`}
+                          boxSize="50px"
+                          objectFit="cover"
+                        />
+                      </Box>
+                    ))}
+                  </HStack>
+                </VStack>
               )}
-          </Flex>
+            </HStack>
+          </Box>
         ))}
-      </Flex>
+      </VStack>
     </Box>
   );
 };
