@@ -220,16 +220,11 @@ function GameLobby() {
   useEffect(() => {
     // Ensure this runs whenever gameData changes
     if (gameData) {
-      console.log("gameData updated:", gameData);
       const currentCurRound = gameData.cur_round || [];
-      console.log("gameData.cur_round:", currentCurRound);
-      console.log("gameData.cur_round.length:", currentCurRound.length);
 
       const lastRoundEntry = currentCurRound[currentCurRound.length - 1];
-      console.log("Last entry in gameData.cur_round:", lastRoundEntry);
 
       const tempLastHand = lastRoundEntry?.[1];
-      console.log("Second item in the last entry (lastHand):", tempLastHand);
 
       if (lastHand !== tempLastHand) {
         console.log("Updating last hand to", tempLastHand);

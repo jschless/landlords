@@ -8,40 +8,25 @@ import {
   Box,
   Heading,
 } from "@chakra-ui/react";
+import Card from "./Card.jsx";
 
 const CardMoveButtons = ({ possibleMoves, handleMove }) => {
   return (
     <>
       <Heading align="center">Recommended Moves</Heading>
       <Flex width="100%" justify="center" wrap="wrap">
-        {" "}
-        {/* Centered */}
-        <ButtonGroup spacing={4}>
-          {" "}
-          {/* Added spacing for buttons */}
+        <ButtonGroup spacing={2}>
           {possibleMoves.map((move, index) => {
-            const handCardImages = move.hand_cards.map((card, index) => (
-              <Image
-                key={`${card}-${index}`}
-                src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                alt={`Card ${card}`}
-                boxSize="50px"
-                margin="0 2"
-              />
+            const handCardImages = move.hand_cards.map((card, outerIndex) => (
+              <Card key={`handcard-${outerIndex}-${index}`} card={card} />
             ));
 
-            const kickerCardImages = move.kicker_cards.map((card, index) => (
-              <Image
-                key={`${card}-${index}`}
-                src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                alt={`Kicker ${card}`}
-                boxSize="40px"
-                margin="0 2"
-              />
+            const kickerCardImages = move.kicker_cards.map((card, outerIndex) => (
+              <Card key={`kickercard-${outerIndex}-${index}`} card={card} />
             ));
 
             return (
-              <Button key={index} onClick={() => handleMove(move)} marginY={2}>
+              <Button key={`button-${index}`} onClick={() => handleMove(move)} marginY={2}>
                 <Stack direction="row" spacing={2}>
                   {handCardImages}
                 </Stack>
@@ -54,5 +39,4 @@ const CardMoveButtons = ({ possibleMoves, handleMove }) => {
     </>
   );
 };
-
 export default CardMoveButtons;

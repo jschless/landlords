@@ -8,6 +8,7 @@ import {
   HStack,
   Badge,
 } from "@chakra-ui/react";
+import Card from "./Card.jsx";
 
 const Round = ({ hands, bidValue, currentPlayer }) => {
   const scrollRef = useRef();
@@ -81,23 +82,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
                 {hand ? (
                   <HStack spacing={1}>
                     {hand.hand_cards.map((card, i) => (
-                      <Box
-                        key={i}
-                        p={1}
-                        borderWidth={1}
-                        borderColor="black"
-                        borderRadius="md"
-                        transition="transform 0.2s"
-                        _hover={{ transform: "scale(1.1)" }}
-                        bg="gray.50"
-                      >
-                        <Image
-                          src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                          alt={`Card ${card}`}
-                          boxSize="50px"
-                          objectFit="cover"
-                        />
-                      </Box>
+                        <Card key={`handcard-${i}`} card={card}/>
                     ))}
                   </HStack>
                 ) : (
@@ -122,23 +107,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
                   </Text>
                   <HStack spacing={1}>
                     {hand.kicker_cards.map((card, i) => (
-                      <Box
-                        key={i}
-                        p={1}
-                        borderWidth={1}
-                        borderColor="black"
-                        borderRadius="md"
-                        transition="transform 0.2s"
-                        _hover={{ transform: "scale(1.1)" }}
-                        bg="gray.50"
-                      >
-                        <Image
-                          src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                          alt={`Card ${card}`}
-                          boxSize="50px"
-                          objectFit="cover"
-                        />
-                      </Box>
+                        <Card key={`kickercard-${i}`} card={card}/>
                     ))}
                   </HStack>
                 </VStack>

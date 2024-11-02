@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Image, Button, Flex, Text } from "@chakra-ui/react";
-
+import Card from "./Card.jsx";
 function Hand({
   myCards,
   onSubmit,
@@ -35,6 +35,7 @@ function Hand({
         }
       }
     }
+    console.log(selectedCards);
   };
 
   const handleSubmit = () => {
@@ -67,12 +68,10 @@ function Hand({
         {/* Card container with horizontal scrolling */}
         <Flex direction="row" justify="center" wrap="wrap" flex="1" mb={4}>
           {myCards.map((card, index) => (
-            <Image
+            <Card
               key={index}
-              src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-              alt={`Card ${card}`}
-              boxSize="80px"
-              m={2}
+              card={card}
+              index={index}
               border={
                 selectedCards.some((c) => c.index === index)
                   ? "3px solid blue"
@@ -80,7 +79,6 @@ function Hand({
                     ? "3px solid orange"
                     : "none"
               }
-              cursor="pointer"
               onClick={(e) => handleCardClick(e, card, index)}
             />
           ))}
