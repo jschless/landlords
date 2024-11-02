@@ -77,7 +77,7 @@ export const completeGameTestData = {
   ],
   landlord: 0,
   landlord_username: "Dominic Miller",
-  started: false,
+  started: true,
   action: "update",
   current_player: 1,
   current_player_username: "Dominic Miller",
