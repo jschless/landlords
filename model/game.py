@@ -1,7 +1,7 @@
 from .player import Player
 from .hand import Hand
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 from pydantic import BaseModel
 import random
 import logging
@@ -18,11 +18,12 @@ class Game(BaseModel):
     bid: int = 0
     blind: Optional[List[int]] = None
     deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
-    rounds: List[List[Hand]] = []
-    cur_round: List[Hand] = []
+    rounds: List[List[Tuple[str, Hand] | Tuple[str, None]]] = []
+    cur_round: List[Tuple[str, Hand] | Tuple[str, None]] = []
     started: bool = False
     scoreboard: Dict = {}
     game_count: int = 0
+    n_bombs_played: int = 0
 
     def random_gen(self):
         if self.rand_seed:
@@ -81,6 +82,10 @@ class Game(BaseModel):
         self.blind = None
         self.deck = list(range(3, 16)) * 4 + [16, 17]
         self.started = False
+
+    def play_bomb(self):
+        self.bid *= 2
+        self.n_bombs_played += 1
 
     def initialize_scoreboard(self):
         if len(self.scoreboard) == 0:

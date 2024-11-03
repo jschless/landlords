@@ -383,16 +383,15 @@ class GameController:
             logger.info(f"New hand is {new_hand}, old hand was {h}")
             # remove cards
             if new_hand.is_bomb():
-                self.g.bid *= 2
+                self.g.play_bomb()
                 logger.info(f"Bomb was dropped, bid is now {self.g.bid}")
 
             self.g.players[self.g.current_player].remove_cards(
                 new_hand.hand_cards + new_hand.kicker_cards
             )
+
             await self.update_all()
             return new_hand, cur_player
         else:
-            logger.info(
-                f"{new_hand} from {new_hand_json} was not a valid move with existing hand {h}"
-            )
+            logger.info(f"{new_hand}  was not a valid move with existing hand {h}")
             raise ValueError("Not a valid move")
