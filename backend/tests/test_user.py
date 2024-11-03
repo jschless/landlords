@@ -1,4 +1,4 @@
-from model.player import Player
+from backend.model.player import Player
 import pytest
 
 

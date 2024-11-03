@@ -2,9 +2,9 @@ import json
 import os
 import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
-from model.game import Game
-from model.player import Player
-from model.hand import Hand
+from backend.model.game import Game
+from backend.model.player import Player
+from backend.model.hand import Hand
 import backend.agent.agent as agent
 from typing import List, Dict, Tuple
 import random

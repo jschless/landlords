@@ -1,5 +1,5 @@
-from .player import Player
-from .hand import Hand
+from backend.model.player import Player
+from backend.model.hand import Hand
 
 from typing import List, Optional, Dict, Tuple
 from pydantic import BaseModel
@@ -123,18 +123,20 @@ class Game(BaseModel):
             "my_cards": cards,
             "players": new_players,
             "landlord": self.landlord,
-            "landlord_username": None
-            if self.landlord is None
-            else self.players[self.landlord].username,
+            "landlord_username": (
+                None if self.landlord is None else self.players[self.landlord].username
+            ),
             "started": self.started,
             "action": "update",
             "current_player": self.current_player,
-            "current_player_username": None
-            if len(self.players) < 3
-            else self.players[self.current_player].username,
-            "current_player_uid": None
-            if len(self.players) < 3
-            else self.players[self.current_player].uid,
+            "current_player_username": (
+                None
+                if len(self.players) < 3
+                else self.players[self.current_player].username
+            ),
+            "current_player_uid": (
+                None if len(self.players) < 3 else self.players[self.current_player].uid
+            ),
             "scoreboard": self.scoreboard,
             "cur_round": self.cur_round,
             "round_history": self.rounds,

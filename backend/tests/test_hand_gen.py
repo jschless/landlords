@@ -1,4 +1,4 @@
-from model.hand import Hand
+from backend.model.hand import Hand
 import pytest
 
 
