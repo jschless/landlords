@@ -1,6 +1,7 @@
 # PYTHON
 __pycache__/
 venv/
+archive/
 
 # ARCHIVED STUFF
 frontend-svelte.bak
