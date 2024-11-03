@@ -219,8 +219,17 @@ class GameController:
         self.g.game_count = game_count
 
     async def start_game(self) -> None:
-        if os.getenv("TEST") == "True":
+        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
             logger.info("Not shuffling... this is the test environment.")
+            self.g.deck = []
+            self.g.deck.extend([3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7])
+            self.g.deck.extend(
+                [7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12]
+            )
+            self.g.deck.extend(
+                [8, 9, 10, 11, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15]
+            )
+            self.g.deck.extend([15, 16, 17])
         else:
             self.g.shuffle_deck()
 
@@ -261,7 +270,6 @@ class GameController:
                             "message": f"That was an improper hand. You need to submit something of type {cur_hand}.<br>{2-i} attempts remaining.",
                         },
                     )
-
             logger.info(f"The following hand was submitted: {new_hand}, updating")
 
             self.g.next_player()
@@ -283,7 +291,6 @@ class GameController:
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
-                # TODO: frontend auto pass if they can't go
                 logger.info(f"{self.g.players[self.g.current_player]} wins the round")
                 await self.alert_all(
                     f"{self.g.players[self.g.current_player].username} wins the round"
@@ -296,24 +303,12 @@ class GameController:
             await self.update_all()
 
     def deal_cards(self) -> None:
-        if os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
-            # Deal a stacked hand
-            self.g.players[0].deal_cards(
-                [3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7]
-            )
-            self.g.players[1].deal_cards(
-                [3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7]
-            )
-            self.g.players[2].deal_cards(
-                [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 4]
-            )
-        else:
-            for i in range(3):
-                self.g.players[i].deal_cards(sorted(self.g.deck[17 * i : 17 * (i + 1)]))
+        for i in range(3):
+            self.g.players[i].deal_cards(sorted(self.g.deck[17 * i : 17 * (i + 1)]))
 
     def flip_one_card(self) -> None:
         # randomly chose someone to flip a card. they will bid first
-        if os.getenv("TEST") == "True":
+        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
             self.g.current_player = 0
             self.g.players[self.g.current_player].flip_card(index_to_flip=1)
         else:
