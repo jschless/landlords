@@ -3,7 +3,6 @@ import {
   Flex,
   ButtonGroup,
   Button,
-  Image,
   Stack,
   Box,
   Heading,

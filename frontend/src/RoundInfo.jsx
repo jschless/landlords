@@ -6,7 +6,6 @@ import {
   Stack,
   Flex,
   useColorModeValue,
-  Image,
 } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import Card from "./Card.jsx";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Image, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import Card from "./Card.jsx";
 function Hand({
   myCards,
