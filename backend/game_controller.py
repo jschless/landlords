@@ -222,8 +222,12 @@ class GameController:
         self.g.game_count = game_count
 
     async def start_game(self) -> None:
-        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
+        if os.getenv("TEST", "false").lower() == "true":
             logger.info("Not shuffling... this is the test environment.")
+        elif os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
+            logger.info(
+                "Initializing to stacked hands... this is the test environment."
+            )
             self.g.deck = []
             self.g.deck.extend([3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7])
             self.g.deck.extend(
@@ -317,7 +321,10 @@ class GameController:
 
     def flip_one_card(self) -> None:
         # randomly chose someone to flip a card. they will bid first
-        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
+        if (
+            os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true"
+            or os.getenv("TEST", "false").lower() == "true"
+        ):
             self.g.current_player = 0
             self.g.players[self.g.current_player].flip_card(index_to_flip=1)
         else:
