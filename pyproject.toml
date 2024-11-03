@@ -24,3 +24,6 @@ dependencies = [
 
 [tool.pytest.ini_options]
 pythonpath = ["./"]
+
+[tool.ruff.lint]
+ignore = ["F405", "F403"]

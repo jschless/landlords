@@ -5,6 +5,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from model.game import Game
 from model.player import Player
 from model.hand import Hand
+import backend.agent.agent as agent
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
@@ -358,28 +359,40 @@ class GameController:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
         return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
+    def get_prediction(self):
+        moves = agent.predict(self.g)
+        best_move = agent.extract_best_move(moves)
+        hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
+        hand = Hand.parse_hand(hand_cards, kicker_cards)
+        logger.info(f"robot chose {best_move} or {hand}")
+        return hand
+
     async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
         # get turn from current_player
+        if self.g.players[self.g.current_player].robot:
+            new_hand = self.get_prediction()
+        else:
+            serializable_hand = None if h is None else h.model_dump(mode="json")
+            possible_moves = Hand.suggest_moves(
+                h, self.g.players[self.g.current_player].cards
+            )
+            msg = {
+                "action": "make_a_move",
+                "last_hand": serializable_hand,
+                "possible_moves": possible_moves[:5],
+            }
+            logger.info(f"Soliciting move from {self.g.current_player}")
+            await self.send_personal_message(self.g.current_player, msg)
+            new_hand_json = await self.wait_for_message(self.g.current_player, msg)
+            new_hand = self.parse_move(new_hand_json)
+            logger.info(f"Parsed move of {new_hand}")
 
-        serializable_hand = None if h is None else h.model_dump(mode="json")
-        possible_moves = Hand.suggest_moves(
-            h, self.g.players[self.g.current_player].cards
-        )
-        msg = {
-            "action": "make_a_move",
-            "last_hand": serializable_hand,
-            "possible_moves": possible_moves[:5],
-        }
-        logger.info(f"Soliciting move from {self.g.current_player}")
-        await self.send_personal_message(self.g.current_player, msg)
-        new_hand_json = await self.wait_for_message(self.g.current_player, msg)
-        new_hand = self.parse_move(new_hand_json)
-        logger.info(f"Parsed move of {new_hand}")
-
-        # Check if cards are in hand
-        if not self.g.players[self.g.current_player].has_cards(new_hand):
-            logger.info(f"{self.g.current_player} tried to play cards they didn't have")
-            raise ValueError("Player doesn't have the cards")
+            # Check if cards are in hand
+            if not self.g.players[self.g.current_player].has_cards(new_hand):
+                logger.info(
+                    f"{self.g.current_player} tried to play cards they didn't have"
+                )
+                raise ValueError("Player doesn't have the cards")
 
         # Move has been validated, check if it works.
         cur_player = self.g.current_player
