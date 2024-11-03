@@ -11,6 +11,8 @@ class Player(BaseModel):
     cards: List[int] = Field(default_factory=list)
     exposed_cards: List[int] = Field(default_factory=list)
     spent_cards: List[int] = Field(default_factory=list)
+    last_move: List[int] | None = None
+    robot: bool = False
 
     def deal_cards(self, cards: List[int]) -> None:
         if len(cards) not in {3, 17}:
@@ -31,7 +33,7 @@ class Player(BaseModel):
         self.exposed_cards += cards
         self.cards.sort()
 
-    def remove_cards(self, cards: List[int]) -> None:
+    def remove_cards(self, cards: List[int] | None) -> None:
         for c in cards:
             self.cards.remove(c)
             if c in self.exposed_cards:

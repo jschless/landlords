@@ -196,8 +196,10 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        if os.getenv("TEST") == "True":
+        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
             # For better control over when the tests start
+            if self.g.players[self.g.landlord].robot:
+                return
             msg = {"action": "game_over"}
             await self.send_personal_message(self.g.landlord, msg)
             response = await self.wait_for_message(self.g.landlord, msg)
@@ -260,6 +262,12 @@ class GameController:
                 # need to get the right thing from a player, so give them 3 chances then pass
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
+                    if new_hand is None:
+                        self.g.players[new_player].last_move = []
+                    else:
+                        new_hand_cards = new_hand.kicker_cards + new_hand.hand_cards
+                        new_hand_cards.sort()
+                        self.g.players[new_player].last_move = new_hand_cards
                     # break for loop if this is valid
                     break
                 except ValueError:
@@ -323,11 +331,14 @@ class GameController:
             player_id = (starting_player + i) % 3
             self.g.current_player = player_id
             await self.update_all()
-            logger.info(f"Sending bid solicitation to player {i}")
-            msg = {"action": "make_a_bid", "last_bid": highest_bid}
-            await self.send_personal_message(player_id, msg)
-            bid_json = await self.wait_for_message(player_id, msg)
-            bid = int(bid_json["bet"])
+            if self.g.players[player_id].robot:
+                bid = 3  # random.choice([0] + list(range(max(highest_bid, 1), 4)))
+            else:
+                logger.info(f"Sending bid solicitation to player {i}")
+                msg = {"action": "make_a_bid", "last_bid": highest_bid}
+                await self.send_personal_message(player_id, msg)
+                bid_json = await self.wait_for_message(player_id, msg)
+                bid = int(bid_json["bet"])
 
             if bid > highest_bid:
                 highest_bid = bid
