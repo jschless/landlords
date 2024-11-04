@@ -2,6 +2,7 @@ import pytest
 from backend.model.game import Game
 from backend.model.player import Player
 from backend.game_controller import GameController
+from backend.agent.deep import DeepAgent
 from backend.agent.agent import (
     predict,
     convert_to_agent_dict,
@@ -311,7 +312,9 @@ def test_data_conversion():
         "three_landlord_cards": [],
     }
 
-    assert extract_best_move(predict(game)).move == [
+    agent = DeepAgent("landlord", "./baselines/douzero_WP", use_onnx=True)
+
+    assert extract_best_move(predict(game, agent)).move == [
         16,
         17,
     ]
