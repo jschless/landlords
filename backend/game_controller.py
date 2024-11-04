@@ -140,10 +140,11 @@ class GameController:
     async def send_personal_message(
         self, player_id: int, message: Dict, attempt_number: int = 0
     ) -> None:
-        if attempt_number > 30:
+        if attempt_number > 15:
             logger.error(
-                f"Could not send message {message} to {player_id} over past 30 seconds"
+                f"Could not send message {message} to {player_id} over past 15 seconds"
             )
+            raise RuntimeError(f"Could not reconnect to {player_id}")
         if message is None:
             return
         if self.player_to_connection[player_id] not in self.active_connections:
