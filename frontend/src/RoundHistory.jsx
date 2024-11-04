@@ -14,15 +14,16 @@ function RoundHistory({ roundHistory }) {
   const [showHistory, setShowHistory] = useState(false);
   const [showWinningHandOnly, setShowWinningHandOnly] = useState(true); // Toggle for winning hand or all hands
 
-  // Helper function to calculate total cards used in a round
   const getTotalCards = (arr) => {
     let totalCards = 0;
 
     arr.forEach((item) => {
-      const handCards = item[1].hand_cards || [];
-      const kickerCards = item[1].kicker_cards || [];
-
-      totalCards += handCards.length + kickerCards.length;
+      if (item && item[1]) {
+        // Check if item and item[1] are not null/undefined
+        const handCards = item[1].hand_cards || [];
+        const kickerCards = item[1].kicker_cards || [];
+        totalCards += handCards.length + kickerCards.length;
+      }
     });
 
     return totalCards;
@@ -30,8 +31,8 @@ function RoundHistory({ roundHistory }) {
 
   // Find the last non-zero hand in each round (the winning hand)
   const getWinningHand = (round) => {
-    const validHands = round.filter(([, hand]) => hand.base > 0); // Filter hands with base > 0
-    return validHands[validHands.length - 1]; // Return the last non-zero hand
+    const validHands = round.filter(([, hand]) => hand && hand.base > 0); // Check if hand is non-null and has base > 0
+    return validHands[validHands.length - 1] || null; // Return the last non-zero hand or null if none
   };
 
   return (
@@ -109,17 +110,23 @@ function RoundHistory({ roundHistory }) {
                           <Text fontSize="md">
                             <strong>{player}'s Hand:</strong>
                           </Text>
-                          <HStack spacing={2}>
-                            {hand.hand_cards.map((card, cardIndex) => (
-                              <Image
-                                key={cardIndex}
-                                src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
-                                alt={`Card ${card}`}
-                                boxSize="50px"
-                                objectFit="cover"
-                              />
-                            ))}
-                          </HStack>
+                          {hand ? (
+                            <HStack spacing={2}>
+                              {hand.hand_cards.map((card, cardIndex) => (
+                                <Image
+                                  key={cardIndex}
+                                  src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
+                                  alt={`Card ${card}`}
+                                  boxSize="50px"
+                                  objectFit="cover"
+                                />
+                              ))}
+                            </HStack>
+                          ) : (
+                            <Text fontSize="md" color="red.500">
+                              Pass
+                            </Text>
+                          )}
                         </Box>
                       ))}
                     </>
