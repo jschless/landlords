@@ -235,7 +235,6 @@ def test_data_conversion():
         [(u_name, hd) if hd is not None else (u_name, None) for u_name, hd in rd]
         for rd in game_dict["rounds"]
     ]
-    print(rounds)
     game_dict["rounds"] = rounds
     game = Game(**game_dict)
     from dataclasses import asdict
@@ -309,7 +308,7 @@ def test_data_conversion():
         "player_hand_cards": [20, 30],
         "player_position": 0,
         "rival_move": [],
-        "three_landlord_cards": [15, 16, 17],
+        "three_landlord_cards": [],
     }
 
     assert extract_best_move(predict(game)).move == [
@@ -320,6 +319,9 @@ def test_data_conversion():
 
 @pytest.mark.asyncio
 async def test_game_controller():
+    import os
+
+    os.environ["TEST"] = "True"
     gc = GameController("12345")
     gc.initialize_game(
         [
@@ -329,6 +331,7 @@ async def test_game_controller():
         ],
         "12345",
         0,
+        True,
     )
     await gc.start_game()
     print(gc.g.scoreboard)

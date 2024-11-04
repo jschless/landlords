@@ -207,7 +207,9 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        if os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
+        if os.getenv("TEST", "false").lower() == "true":
+            return
+        elif os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
             # For better control over when the tests start
             if self.g.players[self.g.landlord].robot:
                 return
@@ -368,7 +370,8 @@ class GameController:
             self.g.current_player = player_id
             await self.update_all()
             if self.g.players[player_id].robot:
-                await asyncio.sleep(random.uniform(3, 5))
+                if os.getenv("TEST", "false").lower() != "true":
+                    await asyncio.sleep(random.uniform(3, 5))
                 bid = random.choice([0] + list(range(max(highest_bid, 1), 4)))
                 logger.info(f"Robot bid {bid}")
             else:
@@ -416,7 +419,8 @@ class GameController:
         logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:
             delay = random.uniform(3, 5)
-            await asyncio.sleep(delay)
+            if os.getenv("TEST", "false").lower() != "true":
+                await asyncio.sleep(delay)
             new_hand = self.get_single_prediction()
         else:
             serializable_hand = None if h is None else h.model_dump(mode="json")
