@@ -399,11 +399,13 @@ class GameController:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
         return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
-    def get_prediction(self):
+    def gen_predictions(self):
         positions = ["landlord", "landlord_down", "landlord_up"]
         position = positions[(self.g.landlord - self.g.current_player) % 3]
-        moves = agent.predict(self.g, self.agents[position])
-        best_move = agent.extract_best_move(moves)
+        return agent.predict(self.g, self.agents[position])
+
+    def get_single_prediction(self):
+        best_move = agent.extract_best_move(self.gen_predictions())
         hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
         hand = Hand.parse_hand(hand_cards, kicker_cards)
         logger.info(f"robot chose {best_move} or {hand}")
@@ -418,13 +420,23 @@ class GameController:
             new_hand = self.get_prediction()
         else:
             serializable_hand = None if h is None else h.model_dump(mode="json")
-            possible_moves = Hand.suggest_moves(
-                h, self.g.players[self.g.current_player].cards
-            )
+            ai_moves = []
+            for m in self.gen_predictions():
+                temp_hand = Hand.parse_hand(*agent.separate_hand_from_kicker(m.move))
+                if temp_hand is not None:
+                    ai_moves.append(
+                        {
+                            **temp_hand.model_dump(mode="json"),
+                            "win_rate": m.win_rate,
+                            "result": m.result,
+                        }
+                    )
+            ai_moves.sort(key=lambda x: x["win_rate"], reverse=True)
+            logger.info(f"AI moves: {ai_moves}")
             msg = {
                 "action": "make_a_move",
                 "last_hand": serializable_hand,
-                "possible_moves": possible_moves[:5],
+                "ai_moves": ai_moves[:5],
             }
             logger.info(f"Soliciting move from {self.g.current_player}")
             await self.send_personal_message(self.g.current_player, msg)

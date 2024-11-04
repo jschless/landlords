@@ -168,7 +168,7 @@ function GameLobby() {
       } else if (message.action === "make_a_move") {
         // Prompt player for move
         console.log("REQUEST FOR MOVE", message);
-        setPossibleMoves(message.possible_moves);
+        setPossibleMoves(message.ai_moves);
         setPromptMove(true);
         // Set timer
         console.log("Initiating timer");
