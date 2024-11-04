@@ -417,7 +417,7 @@ class GameController:
         if self.g.players[self.g.current_player].robot:
             delay = random.uniform(3, 5)
             await asyncio.sleep(delay)
-            new_hand = self.get_prediction()
+            new_hand = self.get_single_prediction()
         else:
             serializable_hand = None if h is None else h.model_dump(mode="json")
             ai_moves = []
