@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies using uv
         run: |
           pip install uv
-          uv install  # This will read from pyproject.toml or uv.lock
+          uv sync --frozen
 
       - name: Run tests with pytest
         run: |
