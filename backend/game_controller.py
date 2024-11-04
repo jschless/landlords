@@ -392,6 +392,8 @@ class GameController:
         # get turn from current_player
         logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:
+            delay = random.uniform(1, 3)
+            await asyncio.sleep(delay)
             new_hand = self.get_prediction()
         else:
             serializable_hand = None if h is None else h.model_dump(mode="json")
