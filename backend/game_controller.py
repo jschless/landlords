@@ -263,7 +263,8 @@ class GameController:
         await self.determine_landlord()
 
         if self.g.landlord is None:
-            raise NotImplementedError("No one became landlord")
+            await self.alert_all("Everyone passed so we reshuffled")
+            await self.play_again()
         else:
             self.g.players[self.g.landlord].make_landlord(self.g.blind)
             await self.update_all()
@@ -354,7 +355,9 @@ class GameController:
             self.g.current_player = player_id
             await self.update_all()
             if self.g.players[player_id].robot:
-                bid = 3  # random.choice([0] + list(range(max(highest_bid, 1), 4)))
+                await asyncio.sleep(random.uniform(3, 5))
+                bid = 0  # random.choice([0] + list(range(max(highest_bid, 1), 4)))
+                logger.info(f"Robot bid {bid}")
             else:
                 logger.info(f"Sending bid solicitation to player {i}")
                 msg = {"action": "make_a_bid", "last_bid": highest_bid}
@@ -362,6 +365,9 @@ class GameController:
                 bid_json = await self.wait_for_message(player_id, msg)
                 bid = int(bid_json["bet"])
 
+            await self.alert_all(
+                f"{self.g.players[self.g.current_player].username} bid {bid}"
+            )
             if bid > highest_bid:
                 highest_bid = bid
                 highest_bidder = player_id
