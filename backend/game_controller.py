@@ -84,7 +84,7 @@ class GameController:
         self.uid_to_player[uid] = len(self.active_connections)
         self.active_connections.append(websocket)
         if username is None:
-            if os.getenv("TEST") == "True":
+            if os.getenv("TEST", "false") == "True":
                 username = test_names[len(self.g.players)] + f"{self.g.game_count}"
             else:
                 username = fake.name()
@@ -206,7 +206,7 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        if os.getenv("SERVER_DEVELOPMENT").lower() == "true":
+        if os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
             # For better control over when the tests start
             if self.g.players[self.g.landlord].robot:
                 return
