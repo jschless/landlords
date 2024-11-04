@@ -172,17 +172,17 @@ class Hand(BaseModel):
         """Returns a string representation of the hand"""
         if self.base == 0:
             return "empty"
-        elif self.base == 1 and self.chain_length == 0:
+        elif self.base == 1 and self.chain_length == 1:
             return "single"
-        elif self.base == 1 and self.chain_length > 0:
+        elif self.base == 1 and self.chain_length > 1:
             return f"single-{self.chain_length}-chain"
-        elif self.base == 2 and self.chain_length == 0:
+        elif self.base == 2 and self.chain_length == 1:
             return "pair"
-        elif self.base == 2 and self.chain_length > 0:
+        elif self.base == 2 and self.chain_length > 1:
             return f"pair-{self.chain_length}-chain"
-        elif self.base == 3 and self.chain_length == 0:
+        elif self.base == 3 and self.chain_length == 1:
             return "triple"
-        elif self.base == 3 and self.chain_length > 0:
+        elif self.base == 3 and self.chain_length > 1:
             return f"triple-{self.chain_length}-chain"
         elif self.base == 4:
             return "bomb"
