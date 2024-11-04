@@ -356,7 +356,7 @@ class GameController:
             await self.update_all()
             if self.g.players[player_id].robot:
                 await asyncio.sleep(random.uniform(3, 5))
-                bid = 0  # random.choice([0] + list(range(max(highest_bid, 1), 4)))
+                bid = random.choice([0] + list(range(max(highest_bid, 1), 4)))
                 logger.info(f"Robot bid {bid}")
             else:
                 logger.info(f"Sending bid solicitation to player {i}")
