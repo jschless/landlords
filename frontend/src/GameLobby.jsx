@@ -129,8 +129,6 @@ function GameLobby() {
       //     string_repr: "triple-1-chain with 1 single discards",
       //   },
       // ]);
-
-      setPromptMove(true);
       console.log("Alert Messages", alertMessages);
     } else {
       fetchGameData();
