@@ -154,7 +154,7 @@ function GameLobby() {
       console.log(message);
 
       if (message.action === "update") {
-          // Updates screen with new data
+        // Updates screen with new data
         setGameData(message);
       } else if (message.action === "alert") {
         console.log("RECEIVED ALERT", message);
@@ -219,7 +219,7 @@ function GameLobby() {
 
   useEffect(() => {
     // Ensure this runs whenever gameData changes
-      if (gameData) {
+    if (gameData) {
       const currentCurRound = gameData.cur_round || [];
 
       const lastRoundEntry = currentCurRound[currentCurRound.length - 1];

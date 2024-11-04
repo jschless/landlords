@@ -9,7 +9,7 @@ function Hand({
   isLandlord,
   username,
   current_player_username,
-  visibleCards
+  visibleCards,
 }) {
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedKickers, setSelectedKickers] = useState([]);
@@ -27,7 +27,7 @@ function Hand({
 
   // Filter myCards to only include the remaining instances
   const remainingMyCards = [];
-  myCards.forEach(card => {
+  myCards.forEach((card) => {
     if (visibleCardCounts[card]) {
       visibleCardCounts[card]--;
     } else {
@@ -114,15 +114,21 @@ function Hand({
             <Card
               key={`mycard-${index}`}
               card={card}
-              index={visibleCards.length+index}
+              index={visibleCards.length + index}
               border={
-                selectedCards.some((c) => c.index === visibleCards.length+index)
+                selectedCards.some(
+                  (c) => c.index === visibleCards.length + index,
+                )
                   ? "3px solid blue"
-                  : selectedKickers.some((c) => c.index === visibleCards.length+index)
+                  : selectedKickers.some(
+                        (c) => c.index === visibleCards.length + index,
+                      )
                     ? "3px solid orange"
                     : "none"
               }
-              onClick={(e) => handleCardClick(e, card, visibleCards.length+index)}
+              onClick={(e) =>
+                handleCardClick(e, card, visibleCards.length + index)
+              }
             />
           ))}
         </Flex>

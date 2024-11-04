@@ -1,12 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import {
-  Box,
-  Text,
-  Heading,
-  VStack,
-  HStack,
-  Badge,
-} from "@chakra-ui/react";
+import { Box, Text, Heading, VStack, HStack, Badge } from "@chakra-ui/react";
 import Card from "./Card.jsx";
 
 const Round = ({ hands, bidValue, currentPlayer }) => {
@@ -82,7 +75,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
                 {hand ? (
                   <HStack spacing={1}>
                     {hand.hand_cards.map((card, i) => (
-                        <Card key={`handcard-${i}`} card={card}/>
+                      <Card key={`handcard-${i}`} card={card} />
                     ))}
                   </HStack>
                 ) : (
@@ -107,7 +100,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
                   </Text>
                   <HStack spacing={1}>
                     {hand.kicker_cards.map((card, i) => (
-                        <Card key={`kickercard-${i}`} card={card}/>
+                      <Card key={`kickercard-${i}`} card={card} />
                     ))}
                   </HStack>
                 </VStack>

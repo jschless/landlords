@@ -20,12 +20,18 @@ const CardMoveButtons = ({ possibleMoves, handleMove }) => {
               <Card key={`handcard-${outerIndex}-${index}`} card={card} />
             ));
 
-            const kickerCardImages = move.kicker_cards.map((card, outerIndex) => (
-              <Card key={`kickercard-${outerIndex}-${index}`} card={card} />
-            ));
+            const kickerCardImages = move.kicker_cards.map(
+              (card, outerIndex) => (
+                <Card key={`kickercard-${outerIndex}-${index}`} card={card} />
+              ),
+            );
 
             return (
-              <Button key={`button-${index}`} onClick={() => handleMove(move)} marginY={2}>
+              <Button
+                key={`button-${index}`}
+                onClick={() => handleMove(move)}
+                marginY={2}
+              >
                 <Stack direction="row" spacing={2}>
                   {handCardImages}
                 </Stack>

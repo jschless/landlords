@@ -56,7 +56,7 @@ function RoundInfo({ gameData }) {
           </Heading>
           <Flex justify="center" gap={2}>
             {lastHand?.hand_cards?.map((card, i) => (
-                <Card key={i} card={card}/>
+              <Card key={i} card={card} />
             ))}
           </Flex>
         </Box>

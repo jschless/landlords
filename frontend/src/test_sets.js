@@ -17,8 +17,8 @@ export const test1 = {
   landlord: 2,
   landlord_username: "David Hernandez",
   started: true,
-    action: "update",
-    exposed_cards: [],
+  action: "update",
+  exposed_cards: [],
   current_player: 0,
   current_player_username: "Mrs. Julia Bailey",
   scoreboard: {
@@ -63,8 +63,8 @@ export const test1 = {
 export const completeGameTestData = {
   game_id: "CK0BS",
   username: "Dominic Miller",
-    my_cards: [3, 3, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17],
-       my_exposed_cards: [],
+  my_cards: [3, 3, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17],
+  my_exposed_cards: [],
   players: [
     {
       username: "Carla Munoz",
