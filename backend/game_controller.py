@@ -64,11 +64,15 @@ class GameController:
                 await self.send_personal_message(
                     self.uid_to_player[uid], self.awaiting_from[uid]
                 )
-
         else:
             self.add_player(websocket, None, uid)
             await websocket.accept()
             await self.update_all()
+
+            # add players here if its single player
+            if self.single_player:
+                self.g.players.append(Player(username="robot1", uid="1", robot=True))
+                self.g.players.append(Player(username="robot2", uid="2", robot=True))
 
     def disconnect(self, websocket: WebSocket) -> None:
         if websocket in self.active_connections:
@@ -183,6 +187,10 @@ class GameController:
             logger.info("Starting game now!")
             await self.start_game()
 
+        if self.single_player and len(self.g.players) == 3:
+            logger.info("Starting single player game now!")
+            await self.start_game()
+
     async def game_loop(self) -> None:
         while not self.g.is_over():
             await self.run_round()
@@ -216,10 +224,15 @@ class GameController:
         await self.start_game()
 
     def initialize_game(
-        self, players: List[Player], game_id: str, game_count: int
+        self,
+        players: List[Player],
+        game_id: str,
+        game_count: int,
+        against_robots: bool = False,
     ) -> None:
         self.g = Game(game_id=game_id, players=players)
         self.g.game_count = game_count
+        self.single_player = against_robots
 
     async def start_game(self) -> None:
         if os.getenv("TEST", "false").lower() == "true":
@@ -301,6 +314,7 @@ class GameController:
                 self.g.register_hand(
                     self.g.players[(self.g.current_player - 1) % 3].username, None
                 )
+            logger.info(f"Cur hand {cur_hand}")
 
             if self.g.current_player == last_player:
                 # The round is over because the last two people passed
@@ -376,6 +390,7 @@ class GameController:
 
     async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
         # get turn from current_player
+        logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:
             new_hand = self.get_prediction()
         else:

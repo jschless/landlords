@@ -67,6 +67,19 @@ async def create_game():
     return {"game_id": game_id}
 
 
+@app.post("/backend/create_solo_game")
+async def create_solo_game():
+    logger.info("Received create solo game request")
+    game_id = gen_game_id()
+    game_manager = GameController(game_id)
+    game_manager.initialize_game(
+        players=[], game_id=game_id, game_count=len(games), against_robots=True
+    )
+    games[game_id] = game_manager
+    logger.info(f"Trying to return {game_id}")
+    return {"game_id": game_id}
+
+
 @app.get("/backend/game/{game_id}")
 async def game_lobby(game_id: str):
     if game_id not in games:

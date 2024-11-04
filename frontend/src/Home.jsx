@@ -38,6 +38,31 @@ function Home() {
     }
   };
 
+  const createSoloGame = async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_DEVELOPMENT
+        ? "http://localhost:8000/backend"
+        : "https://doughdizhu.com/backend";
+      console.log(apiUrl);
+      const response = await fetch(`${apiUrl}/create_solo_game`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create game");
+      }
+
+      const data = await response.json();
+      const gameId = data.game_id;
+      navigate(`/game/${gameId}`);
+    } catch (error) {
+      console.error("Error creating game:", error);
+    }
+  };
+
   return (
     <Container maxW="container.lg" p={4} centerContent>
       <Stack spacing={6} align="center" textAlign="center">
@@ -56,7 +81,16 @@ function Home() {
           px={8}
           variant="solid"
         >
-          Create Game
+          Create Multiplayer Game
+        </Button>
+        <Button
+          onClick={createSoloGame}
+          colorScheme="teal"
+          size="lg"
+          px={8}
+          variant="solid"
+        >
+          Create Single Player Game
         </Button>
       </Stack>
       <Box
