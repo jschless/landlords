@@ -16,7 +16,7 @@ import SpecialHandAnimation from "./SpecialHandAnimation";
 import { Heading, Container, Flex, Stack } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
 const testMode = process.env.REACT_APP_DEVELOPMENT;
-const TIMER_LENGTH = 15;
+const TIMER_LENGTH = 30;
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -97,38 +97,38 @@ function GameLobby() {
       //   { id: 1, message: "test 1" },
       //   { id: 2, message: "test 2" },
       // ]);
-      setPossibleMoves([
-        {
-          base: 3,
-          chain_length: 1,
-          low: 7,
-          kicker_base: 1,
-          kicker_len: 1,
-          hand_cards: [7, 7, 7],
-          kicker_cards: [3],
-          string_repr: "triple-1-chain with 1 single discards",
-        },
-        {
-          base: 3,
-          chain_length: 1,
-          low: 7,
-          kicker_base: 1,
-          kicker_len: 1,
-          hand_cards: [7, 7, 7],
-          kicker_cards: [3],
-          string_repr: "triple-1-chain with 1 single discards",
-        },
-        {
-          base: 3,
-          chain_length: 1,
-          low: 7,
-          kicker_base: 1,
-          kicker_len: 1,
-          hand_cards: [7, 7, 7],
-          kicker_cards: [3],
-          string_repr: "triple-1-chain with 1 single discards",
-        },
-      ]);
+      // setPossibleMoves([
+      //   {
+      //     base: 3,
+      //     chain_length: 1,
+      //     low: 7,
+      //     kicker_base: 1,
+      //     kicker_len: 1,
+      //     hand_cards: [7, 7, 7],
+      //     kicker_cards: [3],
+      //     string_repr: "triple-1-chain with 1 single discards",
+      //   },
+      //   {
+      //     base: 3,
+      //     chain_length: 1,
+      //     low: 7,
+      //     kicker_base: 1,
+      //     kicker_len: 1,
+      //     hand_cards: [7, 7, 7],
+      //     kicker_cards: [3],
+      //     string_repr: "triple-1-chain with 1 single discards",
+      //   },
+      //   {
+      //     base: 3,
+      //     chain_length: 1,
+      //     low: 7,
+      //     kicker_base: 1,
+      //     kicker_len: 1,
+      //     hand_cards: [7, 7, 7],
+      //     kicker_cards: [3],
+      //     string_repr: "triple-1-chain with 1 single discards",
+      //   },
+      // ]);
 
       setPromptMove(true);
       console.log("Alert Messages", alertMessages);
