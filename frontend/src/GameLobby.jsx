@@ -12,6 +12,7 @@ import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
 import CardMoveButtons from "./CardMoveButtons";
 import CountdownTimer from "./CountdownTimer";
+import Instructions from "./Instructions";
 import SpecialHandAnimation from "./SpecialHandAnimation";
 import { Heading, Container, Flex, Stack } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
@@ -283,8 +284,10 @@ function GameLobby() {
             <Heading size="sm">Game ID: {gameData.game_id}</Heading>
             <RoundInfo gameData={gameData} />
           </Stack>
-
+      <Stack spacing={2} align="center">
+          <Instructions/>
           <RoundHistory roundHistory={gameData.round_history} />
+          </Stack>
         </Flex>
 
         {alertMessages.length > 0 && <AlertMessage messages={alertMessages} />}
