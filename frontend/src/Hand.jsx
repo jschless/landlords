@@ -64,6 +64,12 @@ function Hand({
     }
   };
 
+  const passHand = () => {
+    onSubmit([], []);
+    setSelectedCards([]);
+    setSelectedKickers([]);
+  };
+
   return (
     <Box
       position="relative"
@@ -134,11 +140,30 @@ function Hand({
         </Flex>
 
         {/* Submit button positioned at the bottom */}
-        {promptMove && (
-          <Button onClick={handleSubmit} colorScheme="teal" alignSelf="center">
-            Submit Selected Cards
-          </Button>
-        )}
+        <Flex
+          direction="row"
+          justify="center"
+          wrap="wrap"
+          flex="1"
+          mb={4}
+          gap={8}
+        >
+          {promptMove && (
+            <Button
+              onClick={handleSubmit}
+              colorScheme="teal"
+              alignSelf="center"
+            >
+              Submit Selected Cards
+            </Button>
+          )}
+
+          {promptMove && (
+            <Button onClick={passHand} colorScheme="teal" alignSelf="center">
+              Pass
+            </Button>
+          )}
+        </Flex>
       </Flex>
     </Box>
   );
