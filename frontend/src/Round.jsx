@@ -36,6 +36,7 @@ const Round = ({ hands, bidValue, currentPlayer }) => {
         maxHeight="500px"
         overflowY="auto"
         scrollBehavior="smooth"
+        ref={scrollRef}
       >
         {hands.map(([player, hand], index) => (
           <Box
