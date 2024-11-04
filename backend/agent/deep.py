@@ -39,7 +39,7 @@ def _get_one_hot_bomb(bomb_num):
 
 def _load_model(position, model_dir, use_onnx):
     if not use_onnx or not os.path.isfile(os.path.join(model_dir, position + ".onnx")):
-        from models import model_dict
+        from backend.agent.models import model_dict
 
         model = model_dict[position]()
         model_state_dict = model.state_dict()
