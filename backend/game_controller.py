@@ -276,7 +276,7 @@ class GameController:
 
         while True:
             new_hand = None
-            for i in range(3):
+            for i in range(10):
                 # need to get the right thing from a player, so give them 3 chances then pass
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
@@ -293,7 +293,7 @@ class GameController:
                         self.g.current_player,
                         {
                             "action": "alert",
-                            "message": f"That was an improper hand. You need to submit something of type {cur_hand}.<br>{2-i} attempts remaining.",
+                            "message": f"That was an improper hand. You need to submit something of type {cur_hand}. {9-i} attempts remaining.",
                         },
                     )
             logger.info(f"The following hand was submitted: {new_hand}, updating")
@@ -392,7 +392,7 @@ class GameController:
         # get turn from current_player
         logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:
-            delay = random.uniform(1, 3)
+            delay = random.uniform(3, 5)
             await asyncio.sleep(delay)
             new_hand = self.get_prediction()
         else:
@@ -417,6 +417,10 @@ class GameController:
                     f"{self.g.current_player} tried to play cards they didn't have"
                 )
                 raise ValueError("Player doesn't have the cards")
+
+            if new_hand is None and len(self.g.cur_round) == 0:
+                logger.info(f"{self.g.current_player} tried to pass on the first go")
+                raise ValueError("Player can't pass on their first turn")
 
         # Move has been validated, check if it works.
         cur_player = self.g.current_player
