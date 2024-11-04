@@ -103,6 +103,7 @@ class Game(BaseModel):
     def game_data(self, uid: int):
         new_players = []
         cards = []
+        exposed_cards = []
         username = ""
         for p in self.players:
             if p.uid != uid:
@@ -116,11 +117,13 @@ class Game(BaseModel):
             else:
                 cards = p.cards
                 username = p.username
+                exposed_cards = p.exposed_cards
 
         new_dict = {
             "game_id": self.game_id,
             "username": username,
             "my_cards": cards,
+            "my_exposed_cards": exposed_cards,
             "players": new_players,
             "landlord": self.landlord,
             "landlord_username": (
