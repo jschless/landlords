@@ -237,17 +237,14 @@ class GameController:
         self.g = Game(game_id=game_id, players=players)
         self.g.game_count = game_count
         self.single_player = against_robots
-        if self.single_player:
-            self.agents = {
-                p: DeepAgent(
-                    p,
-                    random.choice(
-                        ["./baselines/douzero_WP", "./baselines/douzero_ADP"]
-                    ),
-                    use_onnx=True,
-                )
-                for p in ["landlord", "landlord_down", "landlord_up"]
-            }
+        self.agents = {
+            p: DeepAgent(
+                p,
+                random.choice(["./baselines/douzero_WP", "./baselines/douzero_ADP"]),
+                use_onnx=True,
+            )
+            for p in ["landlord", "landlord_down", "landlord_up"]
+        }
 
     async def start_game(self) -> None:
         if os.getenv("TEST", "false").lower() == "true":
