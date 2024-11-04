@@ -41,7 +41,7 @@ function OpponentHand({
         </Text>
 
         {exposedCards.map((card, index) => (
-          <Card index={index} card={card} />
+            <Card key={index} index={index} card={card} />
         ))}
         <Card index={99} card={"back-black"} />
         <Text fontSize="lg" fontWeight="bold">

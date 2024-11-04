@@ -4,8 +4,8 @@ import { Box, Text, Fade } from "@chakra-ui/react";
 const AlertMessage = ({ messages }) => {
   return (
     <>
-      {messages.map((alert) => (
-        <Fade key={alert.id} in={true}>
+      {messages.map((alert, i) => (
+        <Fade key={alert.id + i} in={true}>
           <Box
             p={4}
             bg="red.500"
