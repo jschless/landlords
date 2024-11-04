@@ -14,7 +14,9 @@ const MotionText = motion.create(Text);
 
 function RoundInfo({ gameData }) {
   const controls = useAnimation();
-  const lastHand = gameData.cur_round[gameData.cur_round.length - 1]?.[1];
+  const lastHand = gameData.cur_round
+    .filter(([, hand]) => hand !== null)
+    .at(-1)?.[1];
 
   useEffect(() => {
     controls.start({
