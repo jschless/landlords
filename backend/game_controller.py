@@ -207,9 +207,15 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        if os.getenv("TEST", "false").lower() == "true":
+        if os.getenv("TEST", "false").lower() == "true" and any(
+            p.robot for p in self.g.players
+        ):
+            logger.info("Not running another game.")
             return
-        elif os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
+        elif (
+            os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true"
+            or os.getenv("TEST", "false").lower() == "true"
+        ):
             # For better control over when the tests start
             if self.g.players[self.g.landlord].robot:
                 return

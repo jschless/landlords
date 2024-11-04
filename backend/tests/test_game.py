@@ -33,6 +33,7 @@ class TestGame:
                 16,
                 17,
             ],
+            "my_exposed_cards": [15, 16, 17],
             "players": [
                 {"username": "Tom_U", "n_cards": 17, "exposed_cards": [3]},
                 {"username": "Dick_U", "n_cards": 17, "exposed_cards": []},
