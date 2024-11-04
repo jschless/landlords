@@ -90,31 +90,35 @@ function Hand({
 
       <Flex direction="column" justify="space-between" height="100%">
         {/* Display visible cards */}
-        <Text fontSize="md" fontWeight="bold" mb={2}>
-          Visible Cards
-        </Text>
-        <Flex direction="row" justify="center" wrap="wrap" flex="1" mb={4}>
-          {visibleCards.map((card, index) => (
-            <Card
-              key={`visible-${index}`}
-              card={card}
-              index={index}
-              border={
-                selectedCards.some((c) => c.index === index)
-                  ? "3px solid blue"
-                  : selectedKickers.some((c) => c.index === index)
-                    ? "3px solid orange"
-                    : "none"
-              }
-              onClick={(e) => handleCardClick(e, card, index)}
-            />
-          ))}
-        </Flex>
+        {visibleCards.length > 0 && (
+          <>
+            <Text fontSize="md" fontWeight="bold" mb={2}>
+              Visible Cards
+            </Text>
+            <Flex direction="row" justify="center" wrap="wrap" flex="1" mb={4}>
+              {visibleCards.map((card, index) => (
+                <Card
+                  key={`visible-${index}`}
+                  card={card}
+                  index={index}
+                  border={
+                    selectedCards.some((c) => c.index === index)
+                      ? "3px solid blue"
+                      : selectedKickers.some((c) => c.index === index)
+                        ? "3px solid orange"
+                        : "none"
+                  }
+                  onClick={(e) => handleCardClick(e, card, index)}
+                />
+              ))}
+            </Flex>
 
-        {/* Display remaining cards */}
-        <Text fontSize="md" fontWeight="bold" mb={2}>
-          Other Cards
-        </Text>
+            {/* Display remaining cards */}
+            <Text fontSize="md" fontWeight="bold" mb={2}>
+              Other Cards
+            </Text>
+          </>
+        )}
         <Flex direction="row" justify="center" wrap="wrap" flex="1" mb={4}>
           {remainingMyCards.map((card, index) => (
             <Card
