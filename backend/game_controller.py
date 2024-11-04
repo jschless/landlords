@@ -6,6 +6,7 @@ from backend.model.game import Game
 from backend.model.player import Player
 from backend.model.hand import Hand
 import backend.agent.agent as agent
+from backend.agent.deep import DeepAgent
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
@@ -234,6 +235,17 @@ class GameController:
         self.g = Game(game_id=game_id, players=players)
         self.g.game_count = game_count
         self.single_player = against_robots
+        if self.single_player:
+            self.agents = {
+                p: DeepAgent(
+                    p,
+                    random.choice(
+                        ["./baselines/douzero_WP", "./baselines/douzero_ADP"]
+                    ),
+                    use_onnx=True,
+                )
+                for p in ["landlord", "landlord_down", "landlord_up"]
+            }
 
     async def start_game(self) -> None:
         if os.getenv("TEST", "false").lower() == "true":
@@ -388,7 +400,9 @@ class GameController:
         return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
     def get_prediction(self):
-        moves = agent.predict(self.g)
+        positions = ["landlord", "landlord_down", "landlord_up"]
+        position = positions[(self.g.landlord - self.g.current_player) % 3]
+        moves = agent.predict(self.g, self.agents[position])
         best_move = agent.extract_best_move(moves)
         hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
         hand = Hand.parse_hand(hand_cards, kicker_cards)
