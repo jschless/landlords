@@ -30,8 +30,9 @@ def convert_to_agent_dict(game):
     player_hand_cards = convert_list_to_agent(player.cards)
     num_cards_left = [len(game.players[i].cards) for i in iter_order]
 
-    three_landlord_cards = game.blind
-    # TODO: need to ensure the flipped card isn't in this and track when the landlord spends them
+    three_landlord_cards = convert_list_to_agent(
+        game.players[game.landlord].landlord_cards
+    )
 
     card_play_action_seq = []
     for rd in game.rounds:

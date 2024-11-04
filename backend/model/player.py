@@ -11,6 +11,7 @@ class Player(BaseModel):
     cards: List[int] = Field(default_factory=list)
     exposed_cards: List[int] = Field(default_factory=list)
     spent_cards: List[int] = Field(default_factory=list)
+    landlord_cards: List[int] = Field(default_factory=list)
     last_move: List[int] | None = None
     robot: bool = False
 
@@ -31,6 +32,7 @@ class Player(BaseModel):
     def make_landlord(self, cards: List[int]) -> None:
         self.cards += cards
         self.exposed_cards += cards
+        self.landlord_cards += cards
         self.cards.sort()
 
     def remove_cards(self, cards: List[int] | None) -> None:
@@ -38,6 +40,8 @@ class Player(BaseModel):
             self.cards.remove(c)
             if c in self.exposed_cards:
                 self.exposed_cards.remove(c)
+            if c in self.landlord_cards:
+                self.landlord_cards.remove(c)
             self.spent_cards.append(c)
 
     def reset(self) -> None:
