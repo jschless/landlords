@@ -82,6 +82,8 @@ class Game(BaseModel):
         self.blind = None
         self.deck = list(range(3, 16)) * 4 + [16, 17]
         self.started = False
+        self.cur_round = []
+        self.rounds = []
 
     def play_bomb(self):
         self.bid *= 2

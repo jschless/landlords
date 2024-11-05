@@ -265,9 +265,17 @@ async def test_start_round_with_pass():
 
 
 @pytest.mark.asyncio
-async def test_submit_bad_hands_3_times(fastapi_server):
+async def test_submit_bad_hands_10_times(fastapi_server):
     p1 = [
         {"action": "bet", "bet": "1"},
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
+        format_move([10], []),
         format_move([10], []),
         format_move([10], []),
         format_move([10], []),

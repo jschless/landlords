@@ -6,6 +6,7 @@ from backend.model.game import Game
 from backend.model.player import Player
 from backend.model.hand import Hand
 import backend.agent.agent as agent
+from backend.agent.deep import DeepAgent
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
@@ -206,7 +207,15 @@ class GameController:
 
         logger.info(f"Game over. Winner: {winner}.\nScoreboard: {self.g.scoreboard}")
 
-        if os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true":
+        if os.getenv("TEST", "false").lower() == "true" and any(
+            p.robot for p in self.g.players
+        ):
+            logger.info("Not running another game.")
+            return
+        elif (
+            os.getenv("SERVER_DEVELOPMENT", "false").lower() == "true"
+            or os.getenv("TEST", "false").lower() == "true"
+        ):
             # For better control over when the tests start
             if self.g.players[self.g.landlord].robot:
                 return
@@ -234,6 +243,14 @@ class GameController:
         self.g = Game(game_id=game_id, players=players)
         self.g.game_count = game_count
         self.single_player = against_robots
+        self.agents = {
+            p: DeepAgent(
+                p,
+                random.choice(["./baselines/douzero_WP", "./baselines/douzero_ADP"]),
+                use_onnx=True,
+            )
+            for p in ["landlord", "landlord_down", "landlord_up"]
+        }
 
     async def start_game(self) -> None:
         if os.getenv("TEST", "false").lower() == "true":
@@ -356,7 +373,8 @@ class GameController:
             self.g.current_player = player_id
             await self.update_all()
             if self.g.players[player_id].robot:
-                await asyncio.sleep(random.uniform(3, 5))
+                if os.getenv("TEST", "false").lower() != "true":
+                    await asyncio.sleep(random.uniform(3, 5))
                 bid = random.choice([0] + list(range(max(highest_bid, 1), 4)))
                 logger.info(f"Robot bid {bid}")
             else:
@@ -387,9 +405,13 @@ class GameController:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
         return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
-    def get_prediction(self):
-        moves = agent.predict(self.g)
-        best_move = agent.extract_best_move(moves)
+    def gen_predictions(self):
+        positions = ["landlord", "landlord_down", "landlord_up"]
+        position = positions[(self.g.landlord - self.g.current_player) % 3]
+        return agent.predict(self.g, self.agents[position])
+
+    def get_single_prediction(self):
+        best_move = agent.extract_best_move(self.gen_predictions())
         hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
         hand = Hand.parse_hand(hand_cards, kicker_cards)
         logger.info(f"robot chose {best_move} or {hand}")
@@ -400,17 +422,28 @@ class GameController:
         logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:
             delay = random.uniform(3, 5)
-            await asyncio.sleep(delay)
-            new_hand = self.get_prediction()
+            if os.getenv("TEST", "false").lower() != "true":
+                await asyncio.sleep(delay)
+            new_hand = self.get_single_prediction()
         else:
             serializable_hand = None if h is None else h.model_dump(mode="json")
-            possible_moves = Hand.suggest_moves(
-                h, self.g.players[self.g.current_player].cards
-            )
+            ai_moves = []
+            for m in self.gen_predictions():
+                temp_hand = Hand.parse_hand(*agent.separate_hand_from_kicker(m.move))
+                if temp_hand is not None:
+                    ai_moves.append(
+                        {
+                            **temp_hand.model_dump(mode="json"),
+                            "win_rate": m.win_rate,
+                            "result": m.result,
+                        }
+                    )
+            ai_moves.sort(key=lambda x: x["win_rate"], reverse=True)
+            logger.info(f"AI moves: {ai_moves}")
             msg = {
                 "action": "make_a_move",
                 "last_hand": serializable_hand,
-                "possible_moves": possible_moves[:5],
+                "ai_moves": ai_moves[:5],
             }
             logger.info(f"Soliciting move from {self.g.current_player}")
             await self.send_personal_message(self.g.current_player, msg)

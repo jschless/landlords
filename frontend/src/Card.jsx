@@ -8,7 +8,7 @@ function Card({ index, card, border, onClick }) {
         src={`${process.env.PUBLIC_URL}/cards/${card}.png`}
         alt={`Card ${card}`}
         boxSize="60px"
-        m={2}
+        m={1}
         border={border}
         cursor="pointer"
         onClick={onClick}

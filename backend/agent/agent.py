@@ -4,7 +4,6 @@ from collections import namedtuple
 from backend.agent.utils.move_generator import MovesGener
 from backend.agent.utils.utils import *
 from backend.agent.utils import move_detector as md, move_selector as ms
-from backend.agent.deep import DeepAgent
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -31,8 +30,9 @@ def convert_to_agent_dict(game):
     player_hand_cards = convert_list_to_agent(player.cards)
     num_cards_left = [len(game.players[i].cards) for i in iter_order]
 
-    three_landlord_cards = game.blind
-    # TODO: need to ensure the flipped card isn't in this and track when the landlord spends them
+    three_landlord_cards = convert_list_to_agent(
+        game.players[game.landlord].landlord_cards
+    )
 
     card_play_action_seq = []
     for rd in game.rounds:
@@ -100,13 +100,8 @@ def convert_to_agent_dict(game):
     return info_set
 
 
-def predict(game):
+def predict(game, agent):
     info_set = convert_to_agent_dict(game)
-
-    positions = ["landlord", "landlord_down", "landlord_up"]
-    position = positions[(game.landlord - game.current_player) % 3]
-    pretrained_dir = "./baselines/douzero_WP"
-    agent = DeepAgent(position, pretrained_dir, use_onnx=True)
 
     actions, actions_confidence = agent.act(info_set)
     moves = []

@@ -12,6 +12,7 @@ import RoundHistory from "./RoundHistory";
 import TurnBanner from "./TurnBanner";
 import CardMoveButtons from "./CardMoveButtons";
 import CountdownTimer from "./CountdownTimer";
+import Instructions from "./Instructions";
 import SpecialHandAnimation from "./SpecialHandAnimation";
 import { Heading, Container, Flex, Stack } from "@chakra-ui/react";
 import { completeGameTestData } from "./test_sets.js";
@@ -167,7 +168,7 @@ function GameLobby() {
       } else if (message.action === "make_a_move") {
         // Prompt player for move
         console.log("REQUEST FOR MOVE", message);
-        setPossibleMoves(message.possible_moves);
+        setPossibleMoves(message.ai_moves);
         setPromptMove(true);
         // Set timer
         console.log("Initiating timer");
@@ -283,8 +284,10 @@ function GameLobby() {
             <Heading size="sm">Game ID: {gameData.game_id}</Heading>
             <RoundInfo gameData={gameData} />
           </Stack>
-
+      <Stack spacing={2} align="center">
+          <Instructions/>
           <RoundHistory roundHistory={gameData.round_history} />
+          </Stack>
         </Flex>
 
         {alertMessages.length > 0 && <AlertMessage messages={alertMessages} />}
