@@ -1,5 +1,5 @@
-from backend.model.player import Player
-from backend.model.hand import Hand
+from model.player import Player
+from model.hand import Hand
 
 from typing import List, Optional, Dict, Tuple
 from pydantic import BaseModel

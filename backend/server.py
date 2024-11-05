@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 import asyncio
 
-from backend.game_controller import GameController
+from game_controller import GameController
 import logging
 
 logging.basicConfig(

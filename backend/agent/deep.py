@@ -1,6 +1,4 @@
 import os
-
-import torch
 import numpy as np
 from collections import Counter
 
@@ -38,45 +36,6 @@ def _get_one_hot_bomb(bomb_num):
 
 
 def _load_model(position, model_dir, use_onnx):
-    if not use_onnx or not os.path.isfile(os.path.join(model_dir, position + ".onnx")):
-        from backend.agent.models import model_dict
-
-        model = model_dict[position]()
-        model_state_dict = model.state_dict()
-        model_path = os.path.join(model_dir, position + ".ckpt")
-        if torch.cuda.is_available():
-            pretrained = torch.load(model_path, map_location="cuda:0")
-        else:
-            pretrained = torch.load(model_path, map_location="cpu")
-        pretrained = {k: v for k, v in pretrained.items() if k in model_state_dict}
-        model_state_dict.update(pretrained)
-        model.load_state_dict(model_state_dict)
-        if torch.cuda.is_available():
-            model.cuda()
-        model.eval()
-
-        if use_onnx:
-            z = torch.randn(1, 5, 162, requires_grad=True)
-            if position == "landlord":
-                x = torch.randn(1, 373, requires_grad=True)
-            else:
-                x = torch.randn(1, 484, requires_grad=True)
-            torch.onnx.export(
-                model,
-                (z, x),
-                os.path.join(model_dir, position + ".onnx"),
-                export_params=True,
-                opset_version=10,
-                do_constant_folding=True,
-                input_names=["z", "x"],
-                output_names=["y"],
-                dynamic_axes={
-                    "z": {0: "batch_size"},
-                    "x": {0: "batch_size"},
-                    "y": {0: "batch_size"},
-                },
-            )
-
     if use_onnx:
         import onnxruntime
 
@@ -201,17 +160,6 @@ class DeepAgent:
             if self.use_onnx:
                 ort_inputs = {"z": z_batch, "x": x_batch}
                 y_pred = self.model.run(None, ort_inputs)[0]
-            elif torch.cuda.is_available():
-                y_pred = self.model.forward(
-                    torch.from_numpy(z_batch).float().cuda(),
-                    torch.from_numpy(x_batch).float().cuda(),
-                )
-                y_pred = y_pred.cpu().detach().numpy()
-            else:
-                y_pred = self.model.forward(
-                    torch.from_numpy(z_batch).float(), torch.from_numpy(x_batch).float()
-                )
-                y_pred = y_pred.detach().numpy()
         else:
             last_landlord_action = self.cards2array(infoset.last_moves[0])
             last_landlord_action_batch = np.repeat(
@@ -289,17 +237,6 @@ class DeepAgent:
             if self.use_onnx:
                 ort_inputs = {"z": z_batch, "x": x_batch}
                 y_pred = self.model.run(None, ort_inputs)[0]
-            elif torch.cuda.is_available():
-                y_pred = self.model.forward(
-                    torch.from_numpy(z_batch).float().cuda(),
-                    torch.from_numpy(x_batch).float().cuda(),
-                )
-                y_pred = y_pred.cpu().detach().numpy()
-            else:
-                y_pred = self.model.forward(
-                    torch.from_numpy(z_batch).float(), torch.from_numpy(x_batch).float()
-                )
-                y_pred = y_pred.detach().numpy()
 
         y_pred = y_pred.flatten()
 

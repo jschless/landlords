@@ -2,11 +2,11 @@ import json
 import os
 import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
-from backend.model.game import Game
-from backend.model.player import Player
-from backend.model.hand import Hand
-import backend.agent.agent as agent
-from backend.agent.deep import DeepAgent
+from model.game import Game
+from model.player import Player
+from model.hand import Hand
+import agent.agent as agent
+from agent.deep import DeepAgent
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
@@ -413,6 +413,7 @@ class GameController:
     def get_single_prediction(self):
         best_move = agent.extract_best_move(self.gen_predictions())
         hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
+        logger.info(f"robot wants to play {hand_cards} and {kicker_cards}")
         hand = Hand.parse_hand(hand_cards, kicker_cards)
         logger.info(f"robot chose {best_move} or {hand}")
         return hand

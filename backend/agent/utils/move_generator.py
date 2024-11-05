@@ -187,6 +187,7 @@ class MovesGener(object):
 
         result = list()
         for fc in four_cards:
+            cards_list = list(set([k for k in self.cards_list if k != fc]))
             cards_list = [k for k in self.cards_list if k != fc]
             subcards = select(cards_list, 2)
             for i in subcards:

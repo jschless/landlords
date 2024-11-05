@@ -1,9 +1,9 @@
 import pytest
-from backend.model.game import Game
-from backend.model.player import Player
-from backend.game_controller import GameController
-from backend.agent.deep import DeepAgent
-from backend.agent.agent import (
+from model.game import Game
+from model.player import Player
+from game_controller import GameController
+from agent.deep import DeepAgent
+from agent.agent import (
     predict,
     convert_to_agent_dict,
     extract_best_move,
@@ -337,7 +337,6 @@ async def test_game_controller():
         True,
     )
     await gc.start_game()
-    print(gc.g.scoreboard)
     return
 
 

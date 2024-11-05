@@ -249,6 +249,16 @@ class TestHand:
             hand_cards=[3, 3, 3, 3],
             kicker_cards=[],
         )
+        assert Hand.parse_hand([3, 3, 3, 3], [4, 5]) == Hand(
+            base=4,
+            chain_length=1,
+            low=3,
+            kicker_base=1,
+            kicker_len=2,
+            hand_cards=[3, 3, 3, 3],
+            kicker_cards=[4, 5],
+        )
+
         assert Hand.parse_hand([16, 17], []) == Hand(
             base=5,
             chain_length=1,

@@ -28,8 +28,8 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile.uv
+          context: ./backend
+          file: ./backend/Dockerfile.uv
           push: true
           tags: jschless/landlords-backend:latest
 

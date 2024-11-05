@@ -2,7 +2,7 @@ import multiprocessing
 import asyncio
 import pytest
 import uvicorn
-from backend.server import app
+from server import app
 import os
 from .utils import format_move
 
