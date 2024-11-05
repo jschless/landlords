@@ -7,6 +7,7 @@ from model.player import Player
 from model.hand import Hand
 import agent.agent as agent
 from agent.deep import DeepAgent
+from analytics.gen_hand_distribution import make_bet_by_move_length
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
@@ -375,7 +376,9 @@ class GameController:
             if self.g.players[player_id].robot:
                 if os.getenv("TEST", "false").lower() != "true":
                     await asyncio.sleep(random.uniform(3, 5))
-                bid = random.choice([0] + list(range(max(highest_bid, 1), 4)))
+                bid = make_bet_by_move_length(self.g.players[player_id].cards)
+                if bid != 0 and bid <= highest_bid:  # invalid move, just pass
+                    bid = 0
                 logger.info(f"Robot bid {bid}")
             else:
                 logger.info(f"Sending bid solicitation to player {i}")
