@@ -1,4 +1,4 @@
-from backend.model.hand import Hand
+from model.hand import Hand
 from pydantic import BaseModel, Field
 from typing import List
 from collections import Counter

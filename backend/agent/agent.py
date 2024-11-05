@@ -1,9 +1,9 @@
 import itertools
 
 from collections import namedtuple
-from backend.agent.utils.move_generator import MovesGener
-from backend.agent.utils.utils import *
-from backend.agent.utils import move_detector as md, move_selector as ms
+from agent.utils.move_generator import MovesGener
+from agent.utils.utils import *
+from agent.utils import move_detector as md, move_selector as ms
 from dataclasses import dataclass, field
 from typing import List, Optional
 

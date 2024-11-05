@@ -337,7 +337,6 @@ async def test_game_controller():
         True,
     )
     await gc.start_game()
-    print(gc.g.scoreboard)
     return
 
 

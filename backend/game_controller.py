@@ -2,11 +2,11 @@ import json
 import os
 import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
-from backend.model.game import Game
-from backend.model.player import Player
-from backend.model.hand import Hand
-import backend.agent.agent as agent
-from backend.agent.deep import DeepAgent
+from model.game import Game
+from model.player import Player
+from model.hand import Hand
+import agent.agent as agent
+from agent.deep import DeepAgent
 from typing import List, Dict, Tuple
 import random
 from faker import Faker
