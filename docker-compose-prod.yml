@@ -1,8 +1,6 @@
 services:
   backend:
-    build:
-      dockerfile: Dockerfile.uv
-    container_name: backend
+    image: jschless/landlords-backend:latest
     command: uv run uvicorn backend.server:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
@@ -16,10 +14,7 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-    container_name: frontend
+    image: jschless/landlords-frontend:latest
     environment:
       - REACT_APP_DEVELOPMENT=false
     ports:
@@ -61,6 +56,16 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
+    networks:
+      - web
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - WATCHTOWER_CLEANUP=true
+    command: --interval 300
     networks:
       - web
 
