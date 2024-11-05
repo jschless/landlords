@@ -228,7 +228,13 @@ function GameLobby() {
       if (lastHand !== tempLastHand) {
         console.log("Updating last hand to", tempLastHand);
         setLastHand(tempLastHand);
-        if (tempLastHand?.string_repr.includes("bomb")) {
+
+        if (tempLastHand?.string_repr.includes("ultimate bomb")) {
+          setSpecialHand("rocket");
+        } else if (
+          tempLastHand?.string_repr.includes("bomb") &&
+          tempLastHand?.string_repr.includes("no discard")
+        ) {
           setSpecialHand("bomb");
         } else if (
           tempLastHand?.string_repr.includes("triple") &&
@@ -284,9 +290,9 @@ function GameLobby() {
             <Heading size="sm">Game ID: {gameData.game_id}</Heading>
             <RoundInfo gameData={gameData} />
           </Stack>
-      <Stack spacing={2} align="center">
-          <Instructions/>
-          <RoundHistory roundHistory={gameData.round_history} />
+          <Stack spacing={2} align="center">
+            <Instructions />
+            <RoundHistory roundHistory={gameData.round_history} />
           </Stack>
         </Flex>
 

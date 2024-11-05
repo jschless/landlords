@@ -50,6 +50,20 @@ function SpecialHandAnimation({ type }) {
           />
         </MotionBox>
       )}
+
+      {type === "rocket" && (
+        <MotionBox
+          initial={{ y: "100vw" }}
+          animate={{ y: "-100vw" }}
+          transition={{ duration: 5 }}
+        >
+          <Image
+            src={`${process.env.PUBLIC_URL}/effects/rocket.jpeg`}
+            alt="Rocket"
+            boxSize="300px"
+          />
+        </MotionBox>
+      )}
     </MotionBox>
   );
 }
