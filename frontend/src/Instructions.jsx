@@ -19,13 +19,16 @@ const Instructions = () => {
           <HStack>
             <Icon as={BsFillShiftFill} boxSize={4} color="teal.500" />
             <Icon as={FaMousePointer} boxSize={4} color="teal.500" />
-            <Text fontSize="md">Shift + Right-click: Select a card for discard</Text>
+            <Text fontSize="md">
+              Shift + Right-click: Select a card for discard
+            </Text>
           </HStack>
           <Text fontSize="md">
             The peasants are in purple, and the landlord is in yellow.
           </Text>
           <Text fontSize="md">
-            When it's your turn, you can click a pre-made move to auto-submit that move.
+            When it's your turn, you can click a pre-made move to auto-submit
+            that move.
           </Text>
         </VStack>
       }
