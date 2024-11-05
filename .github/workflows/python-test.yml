@@ -22,15 +22,18 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies using uv
+        working-directory: backend
         run: |
           pip install uv
           uv sync --frozen
 
       - name: Run tests with pytest
+        working-directory: backend
         run: |
           uv run pytest
 
       - name: Ruff linting
+        working-directory: backend
         run: |
-          ruff check
-          ruff format
+          ruff check .
+          ruff format .
