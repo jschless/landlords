@@ -413,6 +413,7 @@ class GameController:
     def get_single_prediction(self):
         best_move = agent.extract_best_move(self.gen_predictions())
         hand_cards, kicker_cards = agent.separate_hand_from_kicker(best_move.move)
+        logger.info(f"robot wants to play {hand_cards} and {kicker_cards}")
         hand = Hand.parse_hand(hand_cards, kicker_cards)
         logger.info(f"robot chose {best_move} or {hand}")
         return hand
