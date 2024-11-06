@@ -18,8 +18,8 @@ class Game(BaseModel):
     bid: int = 0
     blind: Optional[List[int]] = None
     deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
-    rounds: List[List[Tuple[str, Hand] | Tuple[str, None]]] = []
-    cur_round: List[Tuple[str, Hand] | Tuple[str, None]] = []
+    rounds: List[List[Tuple[str, dict] | Tuple[str, None]]] = []
+    cur_round: List[Tuple[str, dict] | Tuple[str, None]] = []
     started: bool = False
     scoreboard: Dict = {}
     game_count: int = 0
