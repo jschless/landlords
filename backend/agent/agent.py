@@ -1,30 +1,27 @@
 import itertools
 
 from collections import namedtuple
+from model.game import Game
 from agent.utils.move_generator import MovesGener
-from agent.utils.utils import *
-from agent.utils import move_detector as md, move_selector as ms
+from agent.utils import move_detector as md, move_selector as ms, utils
+from agent.deep import DeepAgent
 from dataclasses import dataclass, field
-from typing import List, Optional
-
-card_to_agent_card = {15: 17, 16: 20, 17: 30}
-agent_card_to_card = {17: 15, 20: 16, 30: 17}
 
 
-def convert_list_to_agent(xs):
+PossibleMove = namedtuple("Move", ["move", "move_type", "win_rate", "result"])
+
+
+def convert_list_to_agent(xs: list[int]) -> list[int]:
+    """Maps cards from game space to agent space"""
+    card_to_agent_card = {15: 17, 16: 20, 17: 30}
     return [card_to_agent_card.get(x, x) for x in xs]
 
 
-def convert_to_agent_dict(game):
+def convert_to_agent_dict(game: Game) -> dict:
     player = game.players[game.current_player]
-    # Player position is 0, 1 or 2 what is this?
-    # 0 is landlord, 1 is landlord up, 2 is landlord down
-    p_id = 0
-    for i, p in enumerate(game.players):
-        if p == player:
-            p_id = i
+    # 0 is landlord, 1 is first peasant, 2 is second peasant
 
-    player_position = (game.landlord - p_id) % 3
+    player_position = (game.landlord - game.current_player) % 3
     iter_order = [(game.landlord + i) % 3 for i in range(3)]
 
     player_hand_cards = convert_list_to_agent(player.cards)
@@ -35,24 +32,13 @@ def convert_to_agent_dict(game):
     )
 
     card_play_action_seq = []
-    for rd in game.rounds:
+    for rd in [*game.rounds, game.cur_round]:
         for _, hd in rd:
             if hd is None or hd == []:
                 card_play_action_seq.append([])
             else:
-                try:
-                    hd_cards = hd["hand_cards"] + hd["kicker_cards"]
-                except Exception:
-                    print("sometimes its a dict, sometimes its a hand object...")
-                    hd_cards = hd.hand_cards + hd.kicker_cards
+                hd_cards = hd["hand_cards"] + hd["kicker_cards"]
                 card_play_action_seq.append(convert_list_to_agent(hd_cards))
-
-    for _, hd in game.cur_round:
-        if hd is None:
-            card_play_action_seq.append([])
-        else:
-            hd_cards = hd["hand_cards"] + hd["kicker_cards"]
-            card_play_action_seq.append(convert_list_to_agent(hd_cards))
 
     other_hand_cards = []
     for p in game.players:
@@ -100,12 +86,14 @@ def convert_to_agent_dict(game):
     return info_set
 
 
-def predict(game, agent):
+def predict(game: Game, agent: DeepAgent) -> list[PossibleMove]:
+    """Takes a game and then an agent and returns a list of three or fewer moves"""
     info_set = convert_to_agent_dict(game)
 
     actions, actions_confidence = agent.act(info_set)
     moves = []
-    Move = namedtuple("Move", ["move", "move_type", "win_rate", "result"])
+
+    agent_card_to_card = {17: 15, 20: 16, 30: 17}
     actions = [[agent_card_to_card.get(a, a) for a in action] for action in actions]
     move_types = [md.get_move_type(action) for action in actions]
 
@@ -114,7 +102,7 @@ def predict(game, agent):
         win_rate = max(actions_confidence[i], -1)
         win_rate = min(win_rate, 1)
         moves.append(
-            Move(
+            PossibleMove(
                 move=actions[i],
                 move_type=move_types[i],
                 win_rate=str(round((win_rate + 1) / 2, 4)),
@@ -125,18 +113,18 @@ def predict(game, agent):
     return moves
 
 
-def separate_hand_from_kicker(cards):
-    # Given a prediction (list of cards), determine what is the kicker and what is the hand
+def separate_hand_from_kicker(cards: list[int]) -> tuple[list[int], list[int]]:
+    # Given a prediction (list of cards), determine what is the hand and kicker and return
     mt = md.get_move_type(cards)
 
     discard_types = set(
         [
-            TYPE_6_3_1,
-            TYPE_7_3_2,
-            TYPE_13_4_2,
-            TYPE_14_4_22,
-            TYPE_11_SERIAL_3_1,
-            TYPE_12_SERIAL_3_2,
+            utils.TYPE_6_3_1,
+            utils.TYPE_7_3_2,
+            utils.TYPE_13_4_2,
+            utils.TYPE_14_4_22,
+            utils.TYPE_11_SERIAL_3_1,
+            utils.TYPE_12_SERIAL_3_2,
         ]
     )
     if mt["type"] in discard_types:
@@ -151,26 +139,28 @@ def separate_hand_from_kicker(cards):
         return cards, []
 
 
-def extract_best_move(moves):
+def extract_best_move(moves: list[PossibleMove]) -> PossibleMove:
     return max(moves, key=lambda x: x.win_rate)
 
 
 @dataclass
 class InfoSet:
-    player_position: Optional[int] = None
-    player_hand_cards: List[int] = field(default_factory=list)
+    player_position: int | None = None
+    player_hand_cards: list[int] = field(default_factory=list)
     num_cards_left: int = 0
-    three_landlord_cards: List[int] = field(default_factory=list)
-    card_play_action_seq: List[int] = field(default_factory=list)
-    other_hand_cards: List[int] = field(default_factory=list)
-    last_moves: List[int] = field(default_factory=list)
-    played_cards: List[int] = field(default_factory=list)
+    three_landlord_cards: list[int] = field(default_factory=list)
+    card_play_action_seq: list[int] = field(default_factory=list)
+    other_hand_cards: list[int] = field(default_factory=list)
+    last_moves: list[int] = field(default_factory=list)
+    played_cards: list[int] = field(default_factory=list)
     bomb_num: int = 0
-    rival_move: Optional[int] = None
-    legal_actions: List[int] = field(default_factory=list)
+    rival_move: int | None = None
+    legal_actions: list[int] = field(default_factory=list)
 
 
-def _get_legal_card_play_actions(player_hand_cards, rival_move):
+def _get_legal_card_play_actions(
+    player_hand_cards: list[int], rival_move: list[int]
+) -> list[list[int]]:
     mg = MovesGener(player_hand_cards)
 
     rival_type = md.get_move_type(rival_move)
@@ -178,65 +168,68 @@ def _get_legal_card_play_actions(player_hand_cards, rival_move):
     rival_move_len = rival_type.get("len", 1)
     moves = list()
 
-    if rival_move_type == md.TYPE_0_PASS:
+    if rival_move_type == utils.TYPE_0_PASS:
         moves = mg.gen_moves()
 
-    elif rival_move_type == md.TYPE_1_SINGLE:
+    elif rival_move_type == utils.TYPE_1_SINGLE:
         all_moves = mg.gen_type_1_single()
         moves = ms.filter_type_1_single(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_2_PAIR:
+    elif rival_move_type == utils.TYPE_2_PAIR:
         all_moves = mg.gen_type_2_pair()
         moves = ms.filter_type_2_pair(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_3_TRIPLE:
+    elif rival_move_type == utils.TYPE_3_TRIPLE:
         all_moves = mg.gen_type_3_triple()
         moves = ms.filter_type_3_triple(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_4_BOMB:
+    elif rival_move_type == utils.TYPE_4_BOMB:
         all_moves = mg.gen_type_4_bomb() + mg.gen_type_5_king_bomb()
         moves = ms.filter_type_4_bomb(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_5_KING_BOMB:
+    elif rival_move_type == utils.TYPE_5_KING_BOMB:
         moves = []
 
-    elif rival_move_type == md.TYPE_6_3_1:
+    elif rival_move_type == utils.TYPE_6_3_1:
         all_moves = mg.gen_type_6_3_1()
         moves = ms.filter_type_6_3_1(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_7_3_2:
+    elif rival_move_type == utils.TYPE_7_3_2:
         all_moves = mg.gen_type_7_3_2()
         moves = ms.filter_type_7_3_2(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_8_SERIAL_SINGLE:
+    elif rival_move_type == utils.TYPE_8_SERIAL_SINGLE:
         all_moves = mg.gen_type_8_serial_single(repeat_num=rival_move_len)
         moves = ms.filter_type_8_serial_single(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_9_SERIAL_PAIR:
+    elif rival_move_type == utils.TYPE_9_SERIAL_PAIR:
         all_moves = mg.gen_type_9_serial_pair(repeat_num=rival_move_len)
         moves = ms.filter_type_9_serial_pair(all_moves, rival_move)
-
-    elif rival_move_type == md.TYPE_10_SERIAL_TRIPLE:
+    elif rival_move_type == utils.TYPE_10_SERIAL_TRIPLE:
         all_moves = mg.gen_type_10_serial_triple(repeat_num=rival_move_len)
         moves = ms.filter_type_10_serial_triple(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_11_SERIAL_3_1:
+    elif rival_move_type == utils.TYPE_11_SERIAL_3_1:
         all_moves = mg.gen_type_11_serial_3_1(repeat_num=rival_move_len)
         moves = ms.filter_type_11_serial_3_1(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_12_SERIAL_3_2:
+    elif rival_move_type == utils.TYPE_12_SERIAL_3_2:
         all_moves = mg.gen_type_12_serial_3_2(repeat_num=rival_move_len)
         moves = ms.filter_type_12_serial_3_2(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_13_4_2:
+    elif rival_move_type == utils.TYPE_13_4_2:
         all_moves = mg.gen_type_13_4_2()
         moves = ms.filter_type_13_4_2(all_moves, rival_move)
 
-    elif rival_move_type == md.TYPE_14_4_22:
+    elif rival_move_type == utils.TYPE_14_4_22:
         all_moves = mg.gen_type_14_4_22()
         moves = ms.filter_type_14_4_22(all_moves, rival_move)
 
-    if rival_move_type not in [md.TYPE_0_PASS, md.TYPE_4_BOMB, md.TYPE_5_KING_BOMB]:
+    if rival_move_type not in [
+        utils.TYPE_0_PASS,
+        utils.TYPE_4_BOMB,
+        utils.TYPE_5_KING_BOMB,
+    ]:
         moves = moves + mg.gen_type_4_bomb() + mg.gen_type_5_king_bomb()
 
     if len(rival_move) != 0:  # rival_move is not 'pass'
