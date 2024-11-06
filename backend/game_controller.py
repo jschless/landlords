@@ -8,7 +8,6 @@ from model.hand import Hand
 import agent.agent as agent
 from agent.deep import DeepAgent
 from analytics.gen_hand_distribution import make_bet_by_move_length
-from typing import List, Dict, Tuple
 import random
 from faker import Faker
 
@@ -30,11 +29,11 @@ class GameController:
 
     def __init__(self, game_id: str):
         self.game_id: str = game_id
-        self.uid_to_player: Dict[str, int] = {}
-        self.active_connections: List[WebSocket] = []
-        self.player_to_connection: Dict[int, WebSocket] = {}
+        self.uid_to_player: dict[str, int] = {}
+        self.active_connections: list[WebSocket] = []
+        self.player_to_connection: dict[int, WebSocket] = {}
         self.message_queue: asyncio.Queue = asyncio.Queue()
-        self.awaiting_from: Dict[str, Dict] = {}
+        self.awaiting_from: dict[str, dict] = {}
 
     async def connect(self, websocket: WebSocket, uid: str) -> None:
         logger.info(f"Current connections: {self.active_connections}")
@@ -99,7 +98,7 @@ class GameController:
 
     ### COMMUNICATION FUNCTIONS
 
-    async def wait_for_message(self, player_id: int, msg: Dict) -> Dict:
+    async def wait_for_message(self, player_id: int, msg: dict) -> dict:
         """Retrieve a message from the queue for the given player_id."""
         logger.info(
             f"Call to wait_for_message from {player_id} with action {msg['action']}"
@@ -140,7 +139,7 @@ class GameController:
             self.disconnect(websocket)
 
     async def send_personal_message(
-        self, player_id: int, message: Dict, attempt_number: int = 0
+        self, player_id: int, message: dict, attempt_number: int = 0
     ) -> None:
         if attempt_number > 15:
             logger.error(
@@ -236,7 +235,7 @@ class GameController:
 
     def initialize_game(
         self,
-        players: List[Player],
+        players: list[Player],
         game_id: str,
         game_count: int,
         against_robots: bool = False,
@@ -404,7 +403,7 @@ class GameController:
             f"Setting landlord as highest_bidder: {highest_bidder}. Bid for round is {self.g.bid}"
         )
 
-    def parse_move(self, json_data: Dict) -> Hand:
+    def parse_move(self, json_data: dict) -> Hand:
         logger.info(f"Trying to parse this JSON as a move: {json_data}")
         return Hand.parse_hand(json_data["cards"], json_data["kickers"])
 
@@ -421,7 +420,7 @@ class GameController:
         logger.info(f"robot chose {best_move} or {hand}")
         return hand
 
-    async def get_turn(self, h: Hand | None) -> Tuple[Hand, int]:
+    async def get_turn(self, h: Hand | None) -> tuple[Hand, int]:
         # get turn from current_player
         logger.info(f"{self.g.players[self.g.current_player]} is up")
         if self.g.players[self.g.current_player].robot:

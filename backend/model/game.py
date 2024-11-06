@@ -1,7 +1,6 @@
 from model.player import Player
 from model.hand import Hand
 
-from typing import List, Optional, Dict, Tuple
 from pydantic import BaseModel
 import random
 import logging
@@ -11,30 +10,24 @@ logger = logging.getLogger(__name__)
 
 class Game(BaseModel):
     game_id: str
-    players: List[Player]
+    players: list[Player]
     current_player: int = 0
-    rand_seed: Optional[int] = None
-    landlord: Optional[int] = None
+    rand_seed: int | None = None
+    landlord: int | None = None
     bid: int = 0
-    blind: Optional[List[int]] = None
-    deck: List[int] = list(range(3, 16)) * 4 + [16, 17]
-    rounds: List[List[Tuple[str, dict] | Tuple[str, None]]] = []
-    cur_round: List[Tuple[str, dict] | Tuple[str, None]] = []
+    blind: list[int] | None = None
+    deck: list[int] = list(range(3, 16)) * 4 + [16, 17]
+    rounds: list[list[tuple[str, dict | None]]] = []
+    cur_round: list[tuple[str, dict | None]] = []
     started: bool = False
-    scoreboard: Dict = {}
+    scoreboard: dict = {}
     game_count: int = 0
     n_bombs_played: int = 0
 
-    def random_gen(self):
-        if self.rand_seed:
-            return random.Random(self.rand_seed)
-        else:
-            return random.Random()
+    def shuffle_deck(self) -> None:
+        random.shuffle(self.deck)
 
-    def shuffle_deck(self):
-        self.random_gen().shuffle(self.deck)
-
-    def determine_landlord(self) -> Optional[int]:
+    def determine_landlord(self) -> int | None:
         # Runs bids and returns index of landlord
         current_bid, current_bidder = 0, None
         for i in range(3):
@@ -45,34 +38,34 @@ class Game(BaseModel):
                 return current_bidder
         return current_bidder
 
-    def get_blind(self):
+    def get_blind(self) -> None:
         self.blind = sorted(self.deck[51:])
 
-    def get_winner(self):
+    def get_winner(self) -> Player | None:
         for p in self.players:
             if len(p.cards) == 0:
                 return p
         return None
 
-    def is_over(self):
+    def is_over(self) -> bool:
         return any(len(self.players[i].cards) == 0 for i in range(3))
 
-    def can_start(self):
+    def can_start(self) -> bool:
         return len(self.players) == 3
 
-    def next_player(self):
+    def next_player(self) -> None:
         self.current_player = (self.current_player + 1) % 3
 
-    def initialize_round(self):
+    def initialize_round(self) -> None:
         self.cur_round = []
 
-    def register_hand(self, p: Player, h: Hand):
+    def register_hand(self, p: Player, h: Hand) -> None:
         self.cur_round.append((p, h))
 
-    def register_round(self):
+    def register_round(self) -> None:
         self.rounds.append(self.cur_round)
 
-    def reset_game(self):
+    def reset_game(self) -> None:
         # Runs after a game is over
         for p in self.players:
             p.reset()
@@ -85,16 +78,16 @@ class Game(BaseModel):
         self.cur_round = []
         self.rounds = []
 
-    def play_bomb(self):
+    def play_bomb(self) -> None:
         self.bid *= 2
         self.n_bombs_played += 1
 
-    def initialize_scoreboard(self):
+    def initialize_scoreboard(self) -> None:
         if len(self.scoreboard) == 0:
             for p in self.players:
                 self.scoreboard[p.username] = 0
 
-    def update_scoreboard(self):
+    def update_scoreboard(self) -> None:
         winner = self.get_winner()
         for p in self.players:
             if p.username == winner.username:
@@ -102,7 +95,7 @@ class Game(BaseModel):
             else:
                 self.scoreboard[p.username] -= self.bid
 
-    def game_data(self, uid: int):
+    def game_data(self, uid: int) -> dict:
         new_players = []
         cards = []
         exposed_cards = []
@@ -121,7 +114,7 @@ class Game(BaseModel):
                 username = p.username
                 exposed_cards = p.exposed_cards
 
-        new_dict = {
+        return {
             "game_id": self.game_id,
             "username": username,
             "my_cards": cards,
@@ -147,5 +140,3 @@ class Game(BaseModel):
             "round_history": self.rounds,
             "bid": self.bid,
         }
-
-        return new_dict

@@ -1,6 +1,5 @@
 from model.hand import Hand
 from pydantic import BaseModel, Field
-from typing import List
 from collections import Counter
 import random
 
@@ -8,14 +7,14 @@ import random
 class Player(BaseModel):
     username: str
     uid: str
-    cards: List[int] = Field(default_factory=list)
-    exposed_cards: List[int] = Field(default_factory=list)
-    spent_cards: List[int] = Field(default_factory=list)
-    landlord_cards: List[int] = Field(default_factory=list)
-    last_move: List[int] | None = None
+    cards: list[int] = Field(default_factory=list)
+    exposed_cards: list[int] = Field(default_factory=list)
+    spent_cards: list[int] = Field(default_factory=list)
+    landlord_cards: list[int] = Field(default_factory=list)
+    last_move: list[int] | None = None
     robot: bool = False
 
-    def deal_cards(self, cards: List[int]) -> None:
+    def deal_cards(self, cards: list[int]) -> None:
         if len(cards) not in {3, 17}:
             raise ValueError(
                 "Received strange number of cards: should have gotten 17 or 3"
@@ -29,13 +28,13 @@ class Player(BaseModel):
         else:
             self.exposed_cards.append(self.cards[index_to_flip])
 
-    def make_landlord(self, cards: List[int]) -> None:
+    def make_landlord(self, cards: list[int]) -> None:
         self.cards += cards
         self.exposed_cards += cards
         self.landlord_cards += cards
         self.cards.sort()
 
-    def remove_cards(self, cards: List[int] | None) -> None:
+    def remove_cards(self, cards: list[int] | None) -> None:
         for c in cards:
             self.cards.remove(c)
             if c in self.exposed_cards:

@@ -1,4 +1,3 @@
-from typing import List, Tuple, Dict
 from collections import Counter
 
 from pydantic import BaseModel, conint
@@ -26,12 +25,12 @@ class Hand(BaseModel):
     low: conint(ge=3, le=17)
     kicker_base: conint(ge=0, le=2)
     kicker_len: conint(ge=0, le=5)
-    hand_cards: List[conint(ge=3, le=17)]
-    kicker_cards: List[conint(ge=3, le=17)]
-    string_repr: str = None
+    hand_cards: list[conint(ge=3, le=17)]
+    kicker_cards: list[conint(ge=3, le=17)]
+    string_repr: str | None = None
 
     @classmethod
-    def parse_hand(cls, hand_cards: List[int], kicker_cards: List[int]) -> "Hand":
+    def parse_hand(cls, hand_cards: list[int], kicker_cards: list[int]) -> "Hand":
         # takes a list of cards and kicker cards and pdocues a hand
         if len(hand_cards) == 0 and len(kicker_cards) == 0:
             return None  # represents a pass
@@ -54,12 +53,12 @@ class Hand(BaseModel):
             kicker_cards=kicker_cards,
         )
 
-    def serialize(self):
+    def serialize(self) -> dict:
         self.string_repr = self.__str__()
         return self.model_dump(mode="json")
 
     @staticmethod
-    def longest_consecutive_chain(nums: List[int]) -> int:
+    def longest_consecutive_chain(nums: list[int]) -> int:
         # Returns the largest consecutive chain in the list of ints
         nums = sorted(set(nums))
         longest = current = 1 if nums else 0
@@ -74,7 +73,7 @@ class Hand(BaseModel):
         return max(longest, current)
 
     @classmethod
-    def analyze_cards(cls, cards: List[int]) -> Tuple[int, int, int]:
+    def analyze_cards(cls, cards: list[int]) -> tuple[int, int, int]:
         # analyzes cards to produce a hand
         if len(cards) == 2 and sorted(cards) == [16, 17]:
             # bomb
@@ -105,7 +104,7 @@ class Hand(BaseModel):
             raise ValueError(f"Invalid hand type: base*chain_length != n_cards {cards}")
 
     @classmethod
-    def analyze_kicker(cls, cards: List[int]) -> Tuple[int, int]:
+    def analyze_kicker(cls, cards: list[int]) -> tuple[int, int]:
         # returns base type and n_cards for kicker.
         if len(cards) == 0:
             return 0, 0
@@ -201,7 +200,7 @@ class Hand(BaseModel):
 
         raise ValueError("Should not be reachable")
 
-    def possible_hands(self, cards: List[int]) -> List["Hand"]:
+    def possible_hands(self, cards: list[int]) -> list[tuple[list[int], list[int]]]:
         # Generates the possible hands that can work for a given hand set
 
         # prune things less than base or less than low
@@ -236,7 +235,9 @@ class Hand(BaseModel):
 
         return possible_combos
 
-    def room_for_kicker(self, cards, test_hand, kicker_base, kicker_size):
+    def room_for_kicker(
+        self, cards: list[int], test_hand: "Hand", kicker_base: int, kicker_size: int
+    ) -> list[list[int]]:
         # Determines available kickers for given test_hand
         if kicker_base == 0:
             return []
@@ -259,14 +260,16 @@ class Hand(BaseModel):
         ]
 
     @classmethod
-    def suggest_moves(cls, h, cards):
+    def suggest_moves(cls, h, cards) -> list[dict]:
         if h is None:
             return []
         temp = h.possible_hands(cards)
         return [cls.parse_hand(hand, kick).serialize() for hand, kick in temp]
 
 
-def can_build_chain(freqs: Dict[int, int], start: int, length: int, freq: int) -> bool:
+def can_build_chain(
+    freqs: dict[int, int], start: int, length: int, freq: int
+) -> list[int] | None:
     # Returns the largest consecutive chain in the list of ints
     chain = [start] * freq
     for i in range(1, length):
