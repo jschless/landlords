@@ -24,24 +24,19 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "http://134.122.123.229:3000",
-    "http://134.122.123.229",
-    "http://localhost",
-    "http://doughdizhu.com",
-    "http://doughdizhu.com:3000",
-    "https://doughdizhu.com",
     "https://doughdizhu.com:3000",
 ]
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Allows CORS for the specified origins
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+# TODO: add an actual database lol
 games = {}
 
 
