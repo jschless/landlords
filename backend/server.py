@@ -3,7 +3,6 @@ import string
 
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
 import asyncio
 
 from game_controller import GameController
@@ -47,36 +46,38 @@ def gen_game_id(length=5):
 
 
 @app.get("/backend/")
-async def get_home():
-    return HTMLResponse("<h1>Welcome to the game</h1>")
+async def get_home() -> dict:
+    return {"test": "hello"}
 
 
-@app.post("/backend/create_game")
-async def create_game():
-    logger.info("Received create game request")
-    game_id = gen_game_id()
-    game_manager = GameController(game_id)
-    game_manager.initialize_game(players=[], game_id=game_id, game_count=len(games))
-    games[game_id] = game_manager
-    logger.info(f"Trying to return {game_id}")
-    return {"game_id": game_id}
-
-
-@app.post("/backend/create_solo_game")
-async def create_solo_game():
-    logger.info("Received create solo game request")
+def init_game(against_robots: bool = False) -> dict:
     game_id = gen_game_id()
     game_manager = GameController(game_id)
     game_manager.initialize_game(
-        players=[], game_id=game_id, game_count=len(games), against_robots=True
+        players=[],
+        game_id=game_id,
+        game_count=len(games),
+        against_robots=against_robots,
     )
     games[game_id] = game_manager
     logger.info(f"Trying to return {game_id}")
     return {"game_id": game_id}
 
 
+@app.post("/backend/create_game")
+async def create_game() -> dict:
+    logger.info("Received create game request")
+    return init_game()
+
+
+@app.post("/backend/create_solo_game")
+async def create_solo_game() -> dict:
+    logger.info("Received create solo game request")
+    return init_game(against_robots=True)
+
+
 @app.get("/backend/game/{game_id}")
-async def game_lobby(game_id: str):
+async def game_lobby(game_id: str) -> dict:
     if game_id not in games:
         raise HTTPException(status_code=404, detail="Game not found")
 
@@ -84,7 +85,7 @@ async def game_lobby(game_id: str):
 
 
 @app.websocket("/backend/ws/game/{game_id}")
-async def websocket_endpoint(websocket: WebSocket, game_id: str):
+async def websocket_endpoint(websocket: WebSocket, game_id: str) -> None:
     user_id = websocket.query_params.get("id")
     if not user_id:
         await websocket.close(code=1008)
