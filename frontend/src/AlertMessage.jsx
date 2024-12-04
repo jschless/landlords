@@ -5,7 +5,8 @@ const AlertMessage = ({ messages }) => {
   return (
     <>
       {messages.map((alert, i) => (
-        <Fade key={alert.id + i} in={true}>
+          <Fade key={alert.id + i} in={true}>
+
           <Box
             p={4}
             bg="red.500"

@@ -3,9 +3,6 @@ from model.hand import Hand
 
 from pydantic import BaseModel
 import random
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class Game(BaseModel):

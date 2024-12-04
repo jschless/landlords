@@ -79,6 +79,12 @@ class GameController:
         if websocket in self.active_connections:
             logger.info("Disconnecting websocket")
             self.active_connections.remove(websocket)
+            # pid = None
+            # for i, c in self.player_to_connection.items():
+            #     if c == websocket:
+            #         pid = i
+            # if pid is not None:
+            #     del self.player_to_connection[pid]
 
     def add_player(self, websocket: WebSocket, username: str | None, uid: str) -> None:
         self.player_to_connection[len(self.active_connections)] = websocket
@@ -104,6 +110,7 @@ class GameController:
             f"Call to wait_for_message from {player_id} with action {msg['action']}"
         )
         self.awaiting_from[self.player_to_uid(player_id)] = msg
+        # bandaid to correct for frontend / backend inconsistency in naming
         temp_mapper = {
             "make_a_bid": "bet",
             "make_a_move": "move",
@@ -119,6 +126,8 @@ class GameController:
                 return message
 
     async def listen_for_messages(self, websocket: WebSocket, uid: str) -> None:
+        """Infinite loop to listen for websocket messages.
+        Receives messages and stores them in the game controller's message queue."""
         player_id = self.uid_to_player[uid]
         try:
             logger.info(f"Persistent listener initiated for {player_id}")
@@ -296,7 +305,7 @@ class GameController:
         while True:
             new_hand = None
             for i in range(10):
-                # need to get the right thing from a player, so give them 3 chances then pass
+                # Player has 10 chances to make the right play
                 try:
                     new_hand, new_player = await self.get_turn(cur_hand)
                     if new_hand is None:
@@ -365,7 +374,6 @@ class GameController:
             self.g.players[self.g.current_player].flip_card()
 
     async def determine_landlord(self) -> None:
-        # solicit bids one after the other, needs to be in websocket
         highest_bid, highest_bidder = 0, None
         starting_player = self.g.current_player
         for i in range(3):

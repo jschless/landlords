@@ -60,7 +60,6 @@ def init_game(against_robots: bool = False) -> dict:
         against_robots=against_robots,
     )
     games[game_id] = game_manager
-    logger.info(f"Trying to return {game_id}")
     return {"game_id": game_id}
 
 

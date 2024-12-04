@@ -1,7 +1,8 @@
 from collections import Counter
+import itertools
 
 from pydantic import BaseModel, conint
-import itertools
+
 
 """
 doudizhu hand types:
