@@ -10,6 +10,13 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+    healthcheck:
+      test: ["CMD", "curl", "--request", "POST",  "https://doughdizhu.com/backend/create_solo_game"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
 
   frontend:
     image: jschless/landlords-frontend:latest
@@ -25,6 +32,13 @@ services:
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     networks:
       - web
+    healthcheck:
+      test: ["CMD", "curl",  "https://doughdizhu.com/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
 
 
   traefik:
