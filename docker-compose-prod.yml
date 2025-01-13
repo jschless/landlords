@@ -11,11 +11,11 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
     healthcheck:
-      test: ["CMD", "curl", "--request", "POST",  "https://doughdizhu.com/backend/create_solo_game"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/backend/')"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 20s
     restart: always
 
   frontend:
@@ -33,13 +33,12 @@ services:
     networks:
       - web
     healthcheck:
-      test: ["CMD", "curl",  "https://doughdizhu.com/"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) process.exit(1)})"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 20s
     restart: always
-
 
   traefik:
     image: traefik:v3.1
@@ -51,12 +50,11 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=joe.c.schlessinger@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworigin=https://doughdizhu.com"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworigin=*"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,OPTIONS,PUT"
-      - "traefik.http.routers.backend.middlewares=backend-cors"
+      - "traefik.http.routers.backend.middlewares=backend-cors,rate-limit"
       - "traefik.http.middlewares.rate-limit.rateLimit.average=100"
       - "traefik.http.middlewares.rate-limit.rateLimit.burst=50"
-      - "traefik.http.routers.backend.middlewares=rate-limit"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=joe.c.schlessinger@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
